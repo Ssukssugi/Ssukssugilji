@@ -3,6 +3,7 @@ package com.ssukssugi.ssukssugilji.user.service;
 import com.ssukssugi.ssukssugilji.user.dao.UserRepository;
 import com.ssukssugi.ssukssugilji.user.dto.SocialAuthUserInfoDto;
 import com.ssukssugi.ssukssugilji.user.dto.TermsAgreement;
+import com.ssukssugi.ssukssugilji.user.dto.UserDetailDto;
 import com.ssukssugi.ssukssugilji.user.entity.User;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final UserDetailService userDetailService;
 
     public Optional<User> getUserIdByAuthInfo(SocialAuthUserInfoDto socialAuthUserInfoDto) {
         return userRepository.findBySocialIdAndLoginType(
@@ -48,5 +50,13 @@ public class UserService {
         return userRepository.findById(userId)
             .orElseThrow(() -> new IllegalArgumentException(
                 String.format("User not found, userId : %d", userId)));
+    }
+
+    public void saveUserDetail(UserDetailDto dto) {
+        User user = findById(dto.getUserId());
+        if (userDetailService.findByUser(user).isPresent()) {
+            throw new IllegalArgumentException("UserDetail is already exist");
+        }
+        userDetailService.createUserDetail(dto, user);
     }
 }
