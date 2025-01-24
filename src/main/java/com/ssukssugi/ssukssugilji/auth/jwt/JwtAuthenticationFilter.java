@@ -62,10 +62,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             });
     }
 
-    private Long findUserIdByRefreshToken(String refreshToken) {
-        return jwtService.getUserIdFromRefreshToken(refreshToken);
-    }
-
     private void setAuthenticationToContext(String accessToken) {
         Authentication authentication = jwtService.getAuthentication(accessToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
