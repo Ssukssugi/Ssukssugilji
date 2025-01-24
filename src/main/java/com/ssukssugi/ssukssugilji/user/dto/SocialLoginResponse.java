@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SocialLoginRequest {
+public class SocialLoginResponse {
 
-    private String accessToken;
-    private LoginType loginType;
+    private Boolean isRegistered;
+    private Boolean existInfo;
 }

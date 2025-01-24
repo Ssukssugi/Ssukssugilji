@@ -4,6 +4,7 @@ import com.ssukssugi.ssukssugilji.user.dao.UserRepository;
 import com.ssukssugi.ssukssugilji.user.dto.SocialAuthUserInfoDto;
 import com.ssukssugi.ssukssugilji.user.dto.TermsAgreement;
 import com.ssukssugi.ssukssugilji.user.entity.User;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,12 +17,15 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    public Optional<User> getUserIdByAuthInfo(SocialAuthUserInfoDto socialAuthUserInfoDto) {
+        return userRepository.findBySocialIdAndLoginType(
+            socialAuthUserInfoDto.getSocialId(), socialAuthUserInfoDto.getLoginType());
+    }
+
     @Transactional
-    public Long signInOrSignUp(
+    public Long signUp(
         SocialAuthUserInfoDto socialAuthUserInfoDto, TermsAgreement termsAgreement) {
-        User user = userRepository.findBySocialIdAndLoginType(socialAuthUserInfoDto.getSocialId(),
-                socialAuthUserInfoDto.getLoginType())
-            .orElseGet(() -> createUser(socialAuthUserInfoDto));
+        User user = createUser(socialAuthUserInfoDto);
         updateTermsOfServiceAgreement(user, termsAgreement);
         return user.getUserId();
     }
@@ -35,7 +39,7 @@ public class UserService {
                 .build());
     }
 
-    public void updateTermsOfServiceAgreement(User user, TermsAgreement termsAgreement) {
+    private void updateTermsOfServiceAgreement(User user, TermsAgreement termsAgreement) {
         user.setAgreeToReceiveMarketing(termsAgreement.isMarketing());
         userRepository.save(user);
     }
