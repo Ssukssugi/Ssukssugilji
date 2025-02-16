@@ -47,6 +47,6 @@ public class User extends BaseEntity {
     @Column
     private String nickname;
 
-    @OneToOne(mappedBy = "userDetailId", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private UserDetail userDetail;
 }
