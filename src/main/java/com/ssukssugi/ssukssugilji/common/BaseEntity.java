@@ -19,18 +19,18 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 public abstract class BaseEntity {
 
     @CreatedDate
-    @Column(name = "created_at")
+    @Column
     private LocalDateTime createdAt;
 
     @CreatedBy
-    @Column(name = "created_by")
+    @Column
     private String createdBy;
 
     @LastModifiedDate
-    @Column(name = "updated_at")
+    @Column
     private LocalDateTime updatedAt;
 
     @LastModifiedBy
-    @Column(name = "updated_by")
+    @Column
     private String updatedBy;
 }
