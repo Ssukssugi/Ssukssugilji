@@ -117,7 +117,7 @@ public class JwtService {
 
     public Authentication getAuthentication(String token) {
         User user = userService.findById(getUserId(token, ACCESS_SECRET_KEY));
-        return new UsernamePasswordAuthenticationToken(user, "");
+        return new UsernamePasswordAuthenticationToken(user, "USER");
     }
 
     private Long getUserId(String token, Key secretKey) {
