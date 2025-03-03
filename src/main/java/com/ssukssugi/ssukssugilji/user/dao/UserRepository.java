@@ -8,4 +8,6 @@ import org.springframework.data.repository.CrudRepository;
 public interface UserRepository extends CrudRepository<User, Long> {
 
     Optional<User> findBySocialIdAndLoginType(String socialId, LoginType loginType);
+
+    Optional<User> findByNickname(String nickname);
 }

@@ -59,4 +59,8 @@ public class UserService {
         }
         userDetailService.createUserDetail(dto, user);
     }
+
+    public Boolean checkNicknameExist(String nickname) {
+        return userRepository.findByNickname(nickname).isPresent();
+    }
 }

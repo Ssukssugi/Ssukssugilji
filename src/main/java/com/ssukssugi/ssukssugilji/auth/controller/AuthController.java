@@ -33,4 +33,9 @@ public class AuthController {
         socialLoginApplication.signUp(request, httpServletResponse);
         return ResponseEntity.ok(null);
     }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<Void> reissueAuthToken() {
+        return null;
+    }
 }
