@@ -28,14 +28,14 @@ public class AuthController {
     }
 
     @PostMapping("/sign-up")
-    public ResponseEntity<Object> signUp(
+    public ResponseEntity<Boolean> signUp(
         HttpServletResponse httpServletResponse, @RequestBody SignUpRequest request) {
         socialLoginApplication.signUp(request, httpServletResponse);
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok(true);
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<Void> reissueAuthToken() {
-        return null;
+    public ResponseEntity<Boolean> reissueAuthToken() {
+        return ResponseEntity.ok(true);
     }
 }

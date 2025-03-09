@@ -13,9 +13,6 @@ public class HelloController {
 
     @GetMapping("/hello")
     public String hello() {
-
-        userRepository.findById(1L);
-
         return "Hello, this is ssukssugilji server!";
     }
 }

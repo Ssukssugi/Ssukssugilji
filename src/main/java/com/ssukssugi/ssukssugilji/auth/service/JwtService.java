@@ -68,7 +68,7 @@ public class JwtService {
     }
 
     @Transactional
-    public String generateRefreshToken(HttpServletResponse response, Long requestUserId) {
+    public void generateRefreshToken(HttpServletResponse response, Long requestUserId) {
         String refreshToken = jwtGenerator.generateRefreshToken(REFRESH_SECRET_KEY,
             REFRESH_EXPIRATION, requestUserId);
         ResponseCookie cookie = setTokenToCookie(REFRESH_PREFIX.getValue(), refreshToken,
@@ -80,7 +80,6 @@ public class JwtService {
             .userId(requestUserId)
             .refreshToken(refreshToken)
             .build());
-        return refreshToken;
     }
 
     private ResponseCookie setTokenToCookie(String tokenPrefix, String token, long maxAgeSeconds) {
@@ -141,7 +140,6 @@ public class JwtService {
             throw new RuntimeException(
                 "Format of userId from refreshToken is invalid; refreshToken: " + refreshToken);
         } catch (Exception e) {
-//            throw new BusinessException(ErrorCode.INVALID_JWT);
             throw new InvalidRequestException("Invalid JWT token");
         }
     }
