@@ -24,18 +24,20 @@ public class SocialLoginApplication {
 
     private final Long USER_ID_NOT_FOUND = -1L;
 
-    public SocialLoginResponse socialLogin(
-        SocialLoginRequest request, HttpServletResponse response) {
-
+    public SocialLoginResponse socialLogin(SocialLoginRequest request,
+        HttpServletResponse response) {
         Long userId = findUserIdByAuthInfo(request.getLoginType(), request.getAccessToken());
         boolean isRegistered = !Objects.equals(userId, USER_ID_NOT_FOUND);
+        boolean existInfo = false;
         if (isRegistered) {
             setTokenHeader(response, userId);
+            existInfo = userService.checkIfUserInfoExist(userId);
         }
+
         return SocialLoginResponse
             .builder()
             .isRegistered(isRegistered)
-            // add existInfo
+            .existInfo(existInfo)
             .build();
     }
 
@@ -50,7 +52,8 @@ public class SocialLoginApplication {
     public void signUp(SignUpRequest request, HttpServletResponse response) {
         SocialAuthUserInfoDto socialAuthUserInfoDto = socialAuthContext
             .getAuthUserInfo(request.getLoginType(), request.getAccessToken());
-        Long userId = userService.signUp(socialAuthUserInfoDto, request.getTermsAgreement());
+        Long userId = userService.signUp(socialAuthUserInfoDto, request.getTermsAgreement())
+            .getUserId();
         setTokenHeader(response, userId);
     }
 

@@ -30,14 +30,14 @@ public class KakaoAuthService implements SocialAuthService {
 
         return SocialAuthUserInfoDto.builder()
             .socialId(String.valueOf(userInfo.getId()))
-            .emailAddress(userInfo.getKakaoAccount().getEmail())
+            .emailAddress(userInfo.getKakao_account().getEmail())
             .loginType(LOGIN_TYPE)
             .build();
     }
 
     private void validateResponse(KakaoUserInfoResponse response) {
-        if (!response.getKakaoAccount().getIs_email_valid()
-            || !response.getKakaoAccount().getIs_email_verified()) {
+        if (!response.getKakao_account().getIs_email_valid()
+            || !response.getKakao_account().getIs_email_verified()) {
             throw new RuntimeException("Kakao account email is not valid or verified");
         }
     }

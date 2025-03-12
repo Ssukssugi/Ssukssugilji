@@ -28,4 +28,8 @@ public class UserDetailService {
     public Optional<UserDetail> findByUser(User user) {
         return userDetailRepository.findByUser(user);
     }
+
+    public Boolean existByUser(User user) {
+        return findByUser(user).isPresent();
+    }
 }

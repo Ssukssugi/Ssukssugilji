@@ -25,25 +25,19 @@ public class UserService {
     }
 
     @Transactional
-    public Long signUp(
+    public User signUp(
         SocialAuthUserInfoDto socialAuthUserInfoDto, TermsAgreement termsAgreement) {
         User user = createUser(socialAuthUserInfoDto);
-        updateTermsOfServiceAgreement(user, termsAgreement);
-        return user.getUserId();
+        user.setAgreeToReceiveMarketing(termsAgreement.isMarketing());
+        return userRepository.save(user);
     }
 
     private User createUser(SocialAuthUserInfoDto socialAuthUserInfoDto) {
-        return userRepository.save(
-            User.builder()
-                .loginType(socialAuthUserInfoDto.getLoginType())
-                .emailAddress(socialAuthUserInfoDto.getEmailAddress())
-                .socialId(socialAuthUserInfoDto.getSocialId())
-                .build());
-    }
-
-    private void updateTermsOfServiceAgreement(User user, TermsAgreement termsAgreement) {
-        user.setAgreeToReceiveMarketing(termsAgreement.isMarketing());
-        userRepository.save(user);
+        return User.builder()
+            .loginType(socialAuthUserInfoDto.getLoginType())
+            .emailAddress(socialAuthUserInfoDto.getEmailAddress())
+            .socialId(socialAuthUserInfoDto.getSocialId())
+            .build();
     }
 
     public User findById(Long userId) {
@@ -62,5 +56,9 @@ public class UserService {
 
     public Boolean checkNicknameExist(String nickname) {
         return userRepository.findByNickname(nickname).isPresent();
+    }
+
+    public Boolean checkIfUserInfoExist(Long userId) {
+        return userDetailService.existByUser(findById(userId));
     }
 }
