@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
@@ -49,6 +50,7 @@ public class SocialLoginApplication {
             .orElse(USER_ID_NOT_FOUND);
     }
 
+    @Transactional
     public void signUp(SignUpRequest request, HttpServletResponse response) {
         SocialAuthUserInfoDto socialAuthUserInfoDto = socialAuthContext
             .getAuthUserInfo(request.getLoginType(), request.getAccessToken());
