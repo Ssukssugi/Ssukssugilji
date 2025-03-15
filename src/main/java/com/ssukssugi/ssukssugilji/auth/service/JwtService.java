@@ -75,11 +75,17 @@ public class JwtService {
             REFRESH_EXPIRATION / 1000);
         response.addHeader(JWT_ISSUE_HEADER.getValue(), cookie.toString());
 
-        tokenRepository.save(Token
-            .builder()
-            .userId(requestUserId)
-            .refreshToken(refreshToken)
-            .build());
+        upsertTokenDB(requestUserId, refreshToken);
+    }
+
+    private void upsertTokenDB(Long userId, String refreshToken) {
+        Token entity = tokenRepository.findByUserId(userId)
+            .orElseGet(Token::new);
+
+        entity.setUserId(userId);
+        entity.setRefreshToken(refreshToken);
+
+        tokenRepository.save(entity);
     }
 
     private ResponseCookie setTokenToCookie(String tokenPrefix, String token, long maxAgeSeconds) {
@@ -100,7 +106,8 @@ public class JwtService {
         boolean isRefreshValid =
             jwtUtil.getTokenStatus(token, REFRESH_SECRET_KEY) == JwtTokenStatus.AUTHENTICATED;
 
-        Token storedToken = tokenRepository.findByUserId(userId);
+        Token storedToken = tokenRepository.findByUserId(userId).orElseThrow(
+            () -> new IllegalArgumentException("Token not found by userId: " + userId));
         boolean isTokenMatched = storedToken.getRefreshToken().equals(token);
 
         return isRefreshValid && isTokenMatched;
