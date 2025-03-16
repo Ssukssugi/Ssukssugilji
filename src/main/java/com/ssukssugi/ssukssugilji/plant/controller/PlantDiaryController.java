@@ -17,8 +17,8 @@ public class PlantDiaryController {
     private final PlantDiaryService plantDiaryService;
 
     @PostMapping
-    public ResponseEntity<Long> createPlantDiary(@RequestBody PlantDiaryCreateRequest request) {
-        
-        return null;
+    public ResponseEntity<Boolean> createPlantDiary(@RequestBody PlantDiaryCreateRequest request) {
+        plantDiaryService.createPlantDiary(request);
+        return ResponseEntity.ok(true);
     }
 }

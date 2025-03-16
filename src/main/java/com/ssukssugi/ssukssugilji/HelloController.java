@@ -22,8 +22,9 @@ public class HelloController {
     }
 
     @PostMapping("/image")
-    public ResponseEntity<String> testUploadImage(@RequestParam("file") MultipartFile file)
+    public ResponseEntity<String> testUploadImage(@RequestParam("file") MultipartFile file,
+        @RequestParam String fileName)
         throws IOException {
-        return ResponseEntity.ok(cloudflareR2Service.uploadFile(file));
+        return ResponseEntity.ok(cloudflareR2Service.uploadFile(fileName, file));
     }
 }

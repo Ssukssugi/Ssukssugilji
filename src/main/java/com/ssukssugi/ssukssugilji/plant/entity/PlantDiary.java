@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,6 +24,9 @@ public class PlantDiary {
     @Id
     @GeneratedValue
     private Long diaryId;
+
+    @Column
+    private LocalDate date;
 
     @Column
     private String imageUrl;
