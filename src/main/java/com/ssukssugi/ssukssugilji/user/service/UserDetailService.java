@@ -19,6 +19,7 @@ public class UserDetailService {
     public void createUserDetail(UserDetailDto dto, User user) {
         userDetailRepository.save(UserDetail.builder()
             .user(user)
+            .nickname(dto.getNickname())
             .ageGroup(dto.getAgeGroup())
             .plantReason(dto.getPlantReason())
             .signUpPath(dto.getSignUpPath())

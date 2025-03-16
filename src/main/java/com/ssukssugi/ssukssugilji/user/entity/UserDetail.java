@@ -35,6 +35,9 @@ public class UserDetail extends BaseEntity {
     private User user;
 
     @Column
+    private String nickname;
+
+    @Column
     private Long ageGroup;
 
     @Column

@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 public class UserDetailDto {
 
     private Long userId;
+    private String nickname;
     private Long ageGroup;
     private PlantReason plantReason;
     private SignUpPath signUpPath;
