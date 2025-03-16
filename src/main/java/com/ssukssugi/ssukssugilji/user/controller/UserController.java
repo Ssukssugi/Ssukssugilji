@@ -29,7 +29,7 @@ public class UserController {
     public ResponseEntity<DupNicknameCheckResponse> checkNicknameDuplicated(
         @Valid @RequestBody DupNicknameCheckRequest request) {
         DupNicknameCheckResponse response = new DupNicknameCheckResponse();
-        response.setAvailable(userService.checkNicknameExist(request.getNickname()));
+        response.setAvailable(!userService.checkNicknameExist(request.getNickname()));
         return ResponseEntity.ok(response);
     }
 }

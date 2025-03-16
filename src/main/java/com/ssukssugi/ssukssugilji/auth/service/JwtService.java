@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -123,7 +124,14 @@ public class JwtService {
 
     public Authentication getAuthentication(String token) {
         User user = userService.findById(getUserId(token, ACCESS_SECRET_KEY));
-        return new UsernamePasswordAuthenticationToken(user, "USER");
+        UserDetails userDetails = org.springframework.security.core.userdetails.User
+            .withUsername("user")
+            .password("")
+            .roles("USER")
+            .build();
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user,
+            "USER", userDetails.getAuthorities());
+        return auth;
     }
 
     private Long getUserId(String token, Key secretKey) {
