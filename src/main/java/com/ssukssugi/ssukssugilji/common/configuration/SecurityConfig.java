@@ -18,7 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
 
-    public static final String PERMITTED_URI[] = {"/api/v1/auth/**", "/hello"};
+    public static final String PERMITTED_URI[] = {"/api/v1/auth/**", "/hello", "/image"};
     private static final String PERMITTED_ROLES[] = {"USER"};
 
     private final JwtService jwtService;
@@ -40,6 +40,7 @@ public class SecurityConfig {
                     .requestMatchers(PERMITTED_URI).permitAll()
                     // 그 외의 요청들은 PERMITTED_ROLES 중 하나라도 가지고 있어야 접근이 가능하도록 설정
                     .anyRequest().hasAnyRole(PERMITTED_ROLES)
+//                    .hasAnyRole(PERMITTED_ROLES)
             )
 
             // JWT 사용으로 인한 세션 미사용
