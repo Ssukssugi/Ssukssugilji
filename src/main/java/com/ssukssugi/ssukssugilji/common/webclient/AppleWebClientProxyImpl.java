@@ -7,17 +7,17 @@ import io.netty.channel.ChannelOption;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
 import jakarta.annotation.PostConstruct;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.time.Duration;
 import java.util.Date;
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
@@ -29,6 +29,7 @@ import reactor.netty.http.client.HttpClient;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class AppleWebClientProxyImpl implements WebClientProxy {
 
     private WebClient webClient;
@@ -43,9 +44,10 @@ public class AppleWebClientProxyImpl implements WebClientProxy {
     private String APPLE_TEAM_ID;
 
     @Value("${apple.private.key.file.path}")
-    private Resource PRIVATE_KEY_PATH;
+    private String PRIVATE_KEY_PATH;
 
     private String APPLE_CLIENT_SECRET;
+    private final ResourceLoader resourceLoader;
 
     // https://developer.apple.com/documentation/signinwithapplerestapi/generate-and-validate-tokens
     private static final String GET_USERINFO_API_URL = "https://appleid.apple.com/auth/token";
@@ -83,6 +85,20 @@ public class AppleWebClientProxyImpl implements WebClientProxy {
             .setSubject(APPLE_CLIENT_ID)
             .signWith(privateKey, SignatureAlgorithm.ES256)
             .compact();
+    }
+
+    private PrivateKey getPrivateKey() throws Exception {
+        Resource privateKeyFile = resourceLoader.getResource(PRIVATE_KEY_PATH);
+        byte[] keyBytes = privateKeyFile.getInputStream().readAllBytes();
+        String privateKeyPEM = new String(keyBytes)
+            .replace("-----BEGIN PRIVATE KEY-----", "")
+            .replace("-----END PRIVATE KEY-----", "")
+            .replaceAll("\\s", "");
+
+        byte[] decoded = java.util.Base64.getDecoder().decode(privateKeyPEM);
+        PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(decoded);
+        KeyFactory keyFactory = KeyFactory.getInstance("EC");
+        return keyFactory.generatePrivate(spec);
     }
 
     @Override
@@ -129,19 +145,5 @@ public class AppleWebClientProxyImpl implements WebClientProxy {
         response.setRefreshToken((String) map.get("refresh_token"));
         response.setIdToken((String) map.get("id_token"));
         return response;
-    }
-
-    private PrivateKey getPrivateKey() throws Exception {
-        byte[] keyBytes = Files.readAllBytes(
-            Paths.get(PRIVATE_KEY_PATH.getFile().getAbsolutePath()));
-        String privateKeyPEM = new String(keyBytes)
-            .replace("-----BEGIN PRIVATE KEY-----", "")
-            .replace("-----END PRIVATE KEY-----", "")
-            .replaceAll("\\s", "");
-
-        byte[] decoded = java.util.Base64.getDecoder().decode(privateKeyPEM);
-        PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(decoded);
-        KeyFactory keyFactory = KeyFactory.getInstance("EC");
-        return keyFactory.generatePrivate(spec);
     }
 }
