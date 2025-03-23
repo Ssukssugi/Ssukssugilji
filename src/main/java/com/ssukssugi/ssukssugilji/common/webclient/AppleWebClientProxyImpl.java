@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
@@ -42,7 +43,7 @@ public class AppleWebClientProxyImpl implements WebClientProxy {
     private String APPLE_TEAM_ID;
 
     @Value("${apple.private.key.file.path}")
-    private String PRIVATE_KEY_PATH;
+    private Resource PRIVATE_KEY_PATH;
 
     private String APPLE_CLIENT_SECRET;
 
@@ -67,7 +68,7 @@ public class AppleWebClientProxyImpl implements WebClientProxy {
     }
 
     private String generateClientSecret() throws Exception {
-        PrivateKey privateKey = getPrivateKey(PRIVATE_KEY_PATH);
+        PrivateKey privateKey = getPrivateKey();
 
         long now = System.currentTimeMillis();
         long expiresIn = 1000L * 60 * 60 * 24 * 180; // 최대 6개월 (180일)
@@ -130,8 +131,9 @@ public class AppleWebClientProxyImpl implements WebClientProxy {
         return response;
     }
 
-    private PrivateKey getPrivateKey(String filePath) throws Exception {
-        byte[] keyBytes = Files.readAllBytes(Paths.get(filePath));
+    private PrivateKey getPrivateKey() throws Exception {
+        byte[] keyBytes = Files.readAllBytes(
+            Paths.get(PRIVATE_KEY_PATH.getFile().getAbsolutePath()));
         String privateKeyPEM = new String(keyBytes)
             .replace("-----BEGIN PRIVATE KEY-----", "")
             .replace("-----END PRIVATE KEY-----", "")
