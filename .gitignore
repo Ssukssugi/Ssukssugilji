@@ -1,4 +1,5 @@
 application-local.yml
+AuthKey.p8
 
 HELP.md
 .gradle
