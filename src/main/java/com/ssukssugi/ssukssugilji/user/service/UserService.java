@@ -1,6 +1,5 @@
 package com.ssukssugi.ssukssugilji.user.service;
 
-import com.ssukssugi.ssukssugilji.auth.service.JwtService;
 import com.ssukssugi.ssukssugilji.user.dao.UserRepository;
 import com.ssukssugi.ssukssugilji.user.dto.SocialAuthUserInfoDto;
 import com.ssukssugi.ssukssugilji.user.dto.TermsAgreement;
@@ -19,7 +18,6 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserDetailService userDetailService;
-    private final JwtService jwtService;
 
     public Optional<User> getUserIdByAuthInfo(SocialAuthUserInfoDto socialAuthUserInfoDto) {
         return userRepository.findBySocialIdAndLoginType(
