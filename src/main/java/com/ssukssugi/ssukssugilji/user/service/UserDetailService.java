@@ -26,11 +26,22 @@ public class UserDetailService {
             .build());
     }
 
-    public Optional<UserDetail> findByUser(User user) {
+    private UserDetail findByUser(User user) {
+        return findOptionalByUser(user)
+            .orElseThrow(() -> new IllegalArgumentException("UserDetail not found, user: " + user));
+    }
+
+    public Optional<UserDetail> findOptionalByUser(User user) {
         return userDetailRepository.findByUser(user);
     }
 
     public Boolean existByUser(User user) {
-        return findByUser(user).isPresent();
+        return findOptionalByUser(user).isPresent();
+    }
+
+    public void deleteByUserIfExist(User user) {
+        if (existByUser(user)) {
+            userDetailRepository.delete(findByUser(user));
+        }
     }
 }

@@ -7,5 +7,5 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface UserDetailRepository extends CrudRepository<UserDetail, Long> {
 
-    public Optional<UserDetail> findByUser(User user);
+    Optional<UserDetail> findByUser(User user);
 }

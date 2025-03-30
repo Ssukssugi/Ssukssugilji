@@ -1,10 +1,12 @@
 package com.ssukssugi.ssukssugilji.user.service;
 
+import com.ssukssugi.ssukssugilji.auth.service.JwtService;
 import com.ssukssugi.ssukssugilji.user.dao.UserRepository;
 import com.ssukssugi.ssukssugilji.user.dto.SocialAuthUserInfoDto;
 import com.ssukssugi.ssukssugilji.user.dto.TermsAgreement;
 import com.ssukssugi.ssukssugilji.user.dto.UserDetailDto;
 import com.ssukssugi.ssukssugilji.user.entity.User;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +20,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserDetailService userDetailService;
+    private final JwtService jwtService;
 
     public Optional<User> getUserIdByAuthInfo(SocialAuthUserInfoDto socialAuthUserInfoDto) {
         return userRepository.findBySocialIdAndLoginType(
@@ -48,7 +51,7 @@ public class UserService {
 
     public void saveUserDetail(UserDetailDto dto) {
         User user = findById(dto.getUserId());
-        if (userDetailService.findByUser(user).isPresent()) {
+        if (userDetailService.findOptionalByUser(user).isPresent()) {
             throw new IllegalArgumentException("UserDetail is already exist");
         }
         userDetailService.createUserDetail(dto, user);
@@ -60,5 +63,11 @@ public class UserService {
 
     public Boolean checkIfUserInfoExist(Long userId) {
         return userDetailService.existByUser(findById(userId));
+    }
+
+    public void withdraw(User user, HttpServletResponse response) {
+        userRepository.delete(user);
+        userDetailService.deleteByUserIfExist(user);
+        jwtService.logout(user.getUserId(), response);
     }
 }
