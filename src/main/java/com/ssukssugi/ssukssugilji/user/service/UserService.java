@@ -6,7 +6,6 @@ import com.ssukssugi.ssukssugilji.user.dto.SocialAuthUserInfoDto;
 import com.ssukssugi.ssukssugilji.user.dto.TermsAgreement;
 import com.ssukssugi.ssukssugilji.user.dto.UserDetailDto;
 import com.ssukssugi.ssukssugilji.user.entity.User;
-import jakarta.servlet.http.HttpServletResponse;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -65,9 +64,8 @@ public class UserService {
         return userDetailService.existByUser(findById(userId));
     }
 
-    public void withdraw(User user, HttpServletResponse response) {
+    public void withdraw(User user) {
         userRepository.delete(user);
         userDetailService.deleteByUserIfExist(user);
-        jwtService.logout(user.getUserId(), response);
     }
 }

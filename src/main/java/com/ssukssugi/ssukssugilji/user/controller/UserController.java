@@ -1,5 +1,6 @@
 package com.ssukssugi.ssukssugilji.user.controller;
 
+import com.ssukssugi.ssukssugilji.auth.service.JwtService;
 import com.ssukssugi.ssukssugilji.auth.service.SecurityUtil;
 import com.ssukssugi.ssukssugilji.user.dto.DupNicknameCheckRequest;
 import com.ssukssugi.ssukssugilji.user.dto.DupNicknameCheckResponse;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
     private final UserService userService;
+    private final JwtService jwtService;
 
     @PostMapping("/details")
     public ResponseEntity<Boolean> saveUserDetails(UserDetailDto dto) {
@@ -38,7 +40,8 @@ public class UserController {
 
     @DeleteMapping
     public ResponseEntity<Boolean> withdraw(HttpServletResponse response) {
-        userService.withdraw(SecurityUtil.getUser(), response);
+        userService.withdraw(SecurityUtil.getUser());
+        jwtService.logout(SecurityUtil.getUser().getUserId(), response);
         return ResponseEntity.ok(true);
     }
 }
