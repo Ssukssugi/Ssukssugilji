@@ -31,16 +31,21 @@ jobs:
         run: |
           scp -o StrictHostKeyChecking=no my-spring-app.tar ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:/tmp/
 
+      - name: Send docker-compose.yml to server
+        run: |
+          scp -o StrictHostKeyChecking=no docker-compose.yml ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:~/deploy/my-spring-app/
+
       - name: Deploy on server with zero-downtime
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} bash -s << EOF
+            cd ~/deploy/my-spring-app
             docker load -i /tmp/my-spring-app.tar
 
             ACTIVE=\$(docker ps --format '{{.Names}}' | grep spring)
 
             if [[ "\$ACTIVE" == "spring-blue" ]]; then
               docker-compose up -d spring-green
-              sleep 5
+              sleep 15
               curl -f http://localhost:8082/actuator/health || exit 1
 
               docker stop spring-blue && docker rm spring-blue
@@ -48,7 +53,7 @@ jobs:
               sudo nginx -s reload
             else
               docker-compose up -d spring-blue
-              sleep 5
+              sleep 15
               curl -f http://localhost:8081/actuator/health || exit 1
 
               docker stop spring-green && docker rm spring-green
