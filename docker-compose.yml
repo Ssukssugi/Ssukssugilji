@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  spring-blue:
+    image: my-spring-app:latest
+    container_name: spring-blue
+    ports:
+      - "8081:8080"
+    restart: always
+
+  spring-green:
+    image: my-spring-app:latest
+    container_name: spring-green
+    ports:
+      - "8082:8080"
+    restart: always
