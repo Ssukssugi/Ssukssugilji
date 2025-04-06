@@ -33,7 +33,7 @@ jobs:
 
       - name: Deploy on server with zero-downtime
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} bash -s << EOF
             docker load -i /tmp/my-spring-app.tar
 
             ACTIVE=\$(docker ps --format '{{.Names}}' | grep spring)
