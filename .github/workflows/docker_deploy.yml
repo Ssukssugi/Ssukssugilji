@@ -45,7 +45,7 @@ jobs:
 
             if [[ "\$ACTIVE" == "spring-blue" ]]; then
               docker-compose up -d spring-green
-              sleep 15
+              sleep 100
               curl -f http://localhost:8082/actuator/health || exit 1
 
               docker stop spring-blue && docker rm spring-blue
@@ -53,7 +53,7 @@ jobs:
               sudo nginx -s reload
             else
               docker-compose up -d spring-blue
-              sleep 15
+              sleep 100
               curl -f http://localhost:8081/actuator/health || exit 1
 
               docker stop spring-green && docker rm spring-green

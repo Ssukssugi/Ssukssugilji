@@ -7,6 +7,9 @@ spring:
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
 
+server:
+  port: 8080
+
 management:
   endpoints:
     web:
