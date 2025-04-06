@@ -55,4 +55,3 @@ jobs:
               sudo sed -i 's/8082/8081/' /etc/nginx/conf.d/spring.conf
               sudo nginx -s reload
             fi
-EOF
