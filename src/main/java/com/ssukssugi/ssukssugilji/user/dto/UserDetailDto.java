@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserDetailDto {
 
-    private Long userId;
     private String nickname;
     private Long ageGroup;
     private PlantReason plantReason;

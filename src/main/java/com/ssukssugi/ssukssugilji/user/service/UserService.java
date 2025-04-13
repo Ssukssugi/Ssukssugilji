@@ -1,5 +1,6 @@
 package com.ssukssugi.ssukssugilji.user.service;
 
+import com.ssukssugi.ssukssugilji.auth.service.SecurityUtil;
 import com.ssukssugi.ssukssugilji.user.dao.UserRepository;
 import com.ssukssugi.ssukssugilji.user.dto.SocialAuthUserInfoDto;
 import com.ssukssugi.ssukssugilji.user.dto.TermsAgreement;
@@ -47,7 +48,7 @@ public class UserService {
     }
 
     public void saveUserDetail(UserDetailDto dto) {
-        User user = findById(dto.getUserId());
+        User user = SecurityUtil.getUser();
         if (userDetailService.findOptionalByUser(user).isPresent()) {
             throw new IllegalArgumentException("UserDetail is already exist");
         }
