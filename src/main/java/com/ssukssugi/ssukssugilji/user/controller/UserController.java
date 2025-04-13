@@ -25,7 +25,7 @@ public class UserController {
     private final JwtService jwtService;
 
     @PostMapping("/details")
-    public ResponseEntity<Boolean> saveUserDetails(UserDetailDto dto) {
+    public ResponseEntity<Boolean> saveUserDetails(@Valid @RequestBody UserDetailDto dto) {
         userService.saveUserDetail(dto);
         return ResponseEntity.ok(true);
     }
