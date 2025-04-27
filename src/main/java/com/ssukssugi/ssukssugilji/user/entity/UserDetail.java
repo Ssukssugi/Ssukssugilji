@@ -2,15 +2,15 @@ package com.ssukssugi.ssukssugilji.user.entity;
 
 import com.ssukssugi.ssukssugilji.common.BaseEntity;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -41,10 +41,10 @@ public class UserDetail extends BaseEntity {
     private Long ageGroup;
 
     @Column
-    @Enumerated(EnumType.STRING)
-    private PlantReason plantReason;
+    @Convert(converter = PlantReasonListConverter.class)
+    private List<PlantReason> plantReason;
 
     @Column
-    @Enumerated(EnumType.STRING)
-    private SignUpPath signUpPath;
+    @Convert(converter = SignupPathListConverter.class)
+    private List<SignUpPath> signUpPath;
 }

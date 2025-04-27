@@ -1,7 +1,6 @@
 package com.ssukssugi.ssukssugilji.common.configuration;
 
 import com.ssukssugi.ssukssugilji.auth.jwt.JwtAuthenticationFilter;
-import com.ssukssugi.ssukssugilji.auth.service.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,7 +19,7 @@ public class SecurityConfig {
     public static final String PERMITTED_URI[] = {"/api/v1/auth/**", "/hello", "/image"};
     private static final String PERMITTED_ROLES[] = {"USER"};
 
-    private final JwtService jwtService;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -47,8 +46,7 @@ public class SecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
             // JWT 검증 필터 추가
-            .addFilterBefore(new JwtAuthenticationFilter(jwtService),
-                UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
 //            .addFilterBefore(new ExceptionHandlerFilter(), JwtAuthenticationFilter.class)
         ;
 

@@ -123,14 +123,19 @@ public class JwtService {
     }
 
     public Authentication getAuthentication(String token) {
-        User user = userService.findById(getUserId(token, ACCESS_SECRET_KEY));
+        Long userId = getUserId(token, ACCESS_SECRET_KEY);
+        return createUserAuthentication(userId);
+    }
+
+    public Authentication createUserAuthentication(Long userId) {
+        User user = userService.findById(userId);
         UserDetails userDetails = org.springframework.security.core.userdetails.User
             .withUsername("user")
             .password("")
             .roles("USER")
             .build();
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user,
-            "USER", userDetails.getAuthorities());
+            userId, userDetails.getAuthorities());
         return auth;
     }
 
