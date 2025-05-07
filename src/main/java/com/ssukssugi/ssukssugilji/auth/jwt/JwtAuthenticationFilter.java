@@ -39,17 +39,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        try {
-            String authToken = request.getHeader("x-request-auth");
-            Long userId = Long.valueOf(request.getHeader("x-user-id"));
-            if (Objects.equals(authToken, apiAuthToken)) {
-                SecurityContextHolder.getContext().setAuthentication(
-                    jwtService.createUserAuthentication(userId));
-                filterChain.doFilter(request, response);
-                return;
+        String authToken = request.getHeader("x-request-auth");
+        if (authToken != null) {
+            try {
+                Long userId = Long.valueOf(request.getHeader("x-user-id"));
+                if (Objects.equals(authToken, apiAuthToken)) {
+                    SecurityContextHolder.getContext().setAuthentication(
+                        jwtService.createUserAuthentication(userId));
+                    filterChain.doFilter(request, response);
+                    return;
+                }
+            } catch (Exception e) {
+                log.warn("Jwt Authentication by auth header failed ", e);
             }
-        } catch (Exception e) {
-            log.warn("Jwt Authentication by auth header failed ", e);
         }
 
         String accessToken = jwtService.resolveTokenFromCookie(request, JwtRule.ACCESS_PREFIX);
