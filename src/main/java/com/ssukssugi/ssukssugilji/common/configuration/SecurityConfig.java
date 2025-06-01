@@ -16,7 +16,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
 
-    public static final String PERMITTED_URI[] = {"/api/v1/auth/sign-up", "/hello", "/image"};
+    public static final String PERMITTED_URI[] = {"/api/v1/auth/**", "/hello", "/image"};
     private static final String PERMITTED_ROLES[] = {"USER"};
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
