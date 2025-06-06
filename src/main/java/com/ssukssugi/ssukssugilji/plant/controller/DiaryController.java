@@ -1,7 +1,7 @@
 package com.ssukssugi.ssukssugilji.plant.controller;
 
-import com.ssukssugi.ssukssugilji.plant.dto.PlantDiaryCreateRequest;
-import com.ssukssugi.ssukssugilji.plant.service.PlantDiaryService;
+import com.ssukssugi.ssukssugilji.plant.dto.DiaryCreateRequest;
+import com.ssukssugi.ssukssugilji.plant.service.DiaryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,15 +10,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/plant-diaries")
+@RequestMapping("/api/v1/diaries")
 @RequiredArgsConstructor
-public class PlantDiaryController {
+public class DiaryController {
 
-    private final PlantDiaryService plantDiaryService;
+    private final DiaryService diaryService;
 
     @PostMapping
-    public ResponseEntity<Boolean> createPlantDiary(@RequestBody PlantDiaryCreateRequest request) {
-        plantDiaryService.createPlantDiary(request);
+    public ResponseEntity<Boolean> createDiary(@RequestBody DiaryCreateRequest request) {
+        diaryService.createDiary(request);
         return ResponseEntity.ok(true);
     }
 }

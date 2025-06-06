@@ -1,9 +1,9 @@
 package com.ssukssugi.ssukssugilji.plant.service;
 
 import com.ssukssugi.ssukssugilji.common.CloudflareR2Service;
-import com.ssukssugi.ssukssugilji.plant.dao.PlantDiaryRepository;
-import com.ssukssugi.ssukssugilji.plant.dto.PlantDiaryCreateRequest;
-import com.ssukssugi.ssukssugilji.plant.entity.PlantDiary;
+import com.ssukssugi.ssukssugilji.plant.dao.DiaryRepository;
+import com.ssukssugi.ssukssugilji.plant.dto.DiaryCreateRequest;
+import com.ssukssugi.ssukssugilji.plant.entity.Diary;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -12,30 +12,33 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class PlantDiaryService {
+public class DiaryService {
 
-    private final PlantDiaryRepository plantDiaryRepository;
+    private final DiaryRepository diaryRepository;
     private final CloudflareR2Service cloudflareR2Service;
 
     private static final String dir = "plant_diary/";
 
     @Transactional
-    public void createPlantDiary(PlantDiaryCreateRequest request) {
+    public void createDiary(DiaryCreateRequest request) {
         String imageUrl = dir
             + request.getPlantId()
             + request.getDate().format(DateTimeFormatter.ISO_LOCAL_DATE)
             + "_" + UUID.randomUUID();
-        plantDiaryRepository.save(
-            PlantDiary.builder()
+        diaryRepository.save(
+            Diary.builder()
+                .plantId(request.getPlantId())
                 .date(request.getDate())
+                .careType(request.getCareType().toString())
+                .diary(request.getDiary())
                 .imageUrl(imageUrl)
                 .build()
         );
 
         try {
-            cloudflareR2Service.uploadFile(imageUrl, request.getImage());
+            cloudflareR2Service.uploadFile(imageUrl, request.getPlantImage());
         } catch (Exception e) {
-            throw new RuntimeException("Cloudflare R2 service exception", e);
+            throw new RuntimeException("Cloudflare R2 service exception: ", e);
         }
     }
 }

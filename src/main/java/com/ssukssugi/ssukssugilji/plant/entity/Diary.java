@@ -2,6 +2,8 @@ package com.ssukssugi.ssukssugilji.plant.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -19,14 +21,24 @@ import lombok.Setter;
 @Builder
 @Getter
 @Setter
-public class PlantDiary {
+public class Diary {
 
     @Id
     @GeneratedValue
     private Long diaryId;
 
     @Column
+    private Long plantId;
+
+    @Column
     private LocalDate date;
+
+    @Column
+    @Enumerated(EnumType.STRING)
+    private String careType;
+
+    @Column
+    private String diary;
 
     @Column
     private String imageUrl;
