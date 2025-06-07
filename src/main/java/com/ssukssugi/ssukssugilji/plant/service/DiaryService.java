@@ -4,6 +4,7 @@ import com.ssukssugi.ssukssugilji.common.CloudflareR2Service;
 import com.ssukssugi.ssukssugilji.plant.dao.DiaryRepository;
 import com.ssukssugi.ssukssugilji.plant.dto.DiaryCreateRequest;
 import com.ssukssugi.ssukssugilji.plant.entity.Diary;
+import com.ssukssugi.ssukssugilji.plant.entity.Plant;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ public class DiaryService {
 
     private final DiaryRepository diaryRepository;
     private final CloudflareR2Service cloudflareR2Service;
+    private final PlantService plantService;
 
     private static final String dir = "plant_diary/";
 
@@ -25,15 +27,16 @@ public class DiaryService {
             + request.getPlantId()
             + request.getDate().format(DateTimeFormatter.ISO_LOCAL_DATE)
             + "_" + UUID.randomUUID();
-        diaryRepository.save(
-            Diary.builder()
-                .plantId(request.getPlantId())
-                .date(request.getDate())
-                .careType(request.getCareType())
-                .diary(request.getDiary())
-                .imageUrl(imageUrl)
-                .build()
-        );
+        Plant plant = plantService.getById(request.getPlantId());
+
+        Diary diary = Diary.builder()
+            .date(request.getDate())
+            .careType(request.getCareType())
+            .diary(request.getDiary())
+            .imageUrl(imageUrl)
+            .build();
+        plant.addDiary(diary);
+        diaryRepository.save(diary);
 
         try {
             cloudflareR2Service.uploadFile(imageUrl, request.getPlantImage());

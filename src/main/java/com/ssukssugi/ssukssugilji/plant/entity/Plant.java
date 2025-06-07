@@ -12,7 +12,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -53,4 +56,12 @@ public class Plant extends BaseEntity {
 
     @Column
     private Boolean secret;
+
+    @OneToMany(mappedBy = "plant", cascade = CascadeType.ALL)
+    private List<Diary> diaries = new ArrayList<>();
+
+    public void addDiary(Diary diary) {
+        diaries.add(diary);
+        diary.setPlant(this);
+    }
 }

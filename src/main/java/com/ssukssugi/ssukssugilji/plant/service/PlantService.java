@@ -28,7 +28,7 @@ public class PlantService {
         return UserPlantDto.fromEntity(getById(plantId));
     }
 
-    private Plant getById(Long plantId) {
+    public Plant getById(Long plantId) {
         return plantRepository.findById(plantId)
             .orElseThrow(
                 () -> new IllegalArgumentException("Plant not found, plantId = " + plantId));
