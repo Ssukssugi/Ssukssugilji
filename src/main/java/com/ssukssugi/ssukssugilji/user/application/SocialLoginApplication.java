@@ -12,11 +12,13 @@ import com.ssukssugi.ssukssugilji.user.service.auth.SocialAuthContext;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class SocialLoginApplication {
 
     private final SocialAuthContext socialAuthContext;
@@ -33,6 +35,7 @@ public class SocialLoginApplication {
         if (isRegistered) {
             setTokenHeader(response, userId);
             existInfo = userService.checkIfUserInfoExist(userId);
+            log.info("success to social-login, userId: {}, existInfo: {}", userId, existInfo);
         }
 
         return SocialLoginResponse
@@ -56,11 +59,12 @@ public class SocialLoginApplication {
             .getAuthUserInfo(request.getLoginType(), request.getAccessToken());
         Long userId = userService.signUp(socialAuthUserInfoDto, request.getTermsAgreement())
             .getUserId();
+        log.info("Success to sign-up, userId: {}, loginType: {}", userId, request.getLoginType());
         setTokenHeader(response, userId);
     }
 
     private void setTokenHeader(HttpServletResponse response, Long userId) {
-        jwtService.generateAccessToken(response, userId);
-        jwtService.generateRefreshToken(response, userId);
+        jwtService.issueAndSetAccessToken(response, userId);
+        jwtService.issueAndSetRefreshToken(response, userId);
     }
 }

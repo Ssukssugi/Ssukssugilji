@@ -58,7 +58,7 @@ public class JwtService {
         this.REFRESH_EXPIRATION = REFRESH_EXPIRATION;
     }
 
-    public String generateAccessToken(HttpServletResponse response, Long requestUserId) {
+    public String issueAndSetAccessToken(HttpServletResponse response, Long requestUserId) {
         String accessToken = jwtGenerator.generateAccessToken(ACCESS_SECRET_KEY, ACCESS_EXPIRATION,
             requestUserId);
         ResponseCookie cookie = setTokenToCookie(ACCESS_PREFIX.getValue(), accessToken,
@@ -69,7 +69,7 @@ public class JwtService {
     }
 
     @Transactional
-    public void generateRefreshToken(HttpServletResponse response, Long requestUserId) {
+    public void issueAndSetRefreshToken(HttpServletResponse response, Long requestUserId) {
         String refreshToken = jwtGenerator.generateRefreshToken(REFRESH_SECRET_KEY,
             REFRESH_EXPIRATION, requestUserId);
         ResponseCookie cookie = setTokenToCookie(REFRESH_PREFIX.getValue(), refreshToken,
