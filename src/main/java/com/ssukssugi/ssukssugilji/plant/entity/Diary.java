@@ -35,7 +35,7 @@ public class Diary {
 
     @Column
     @Enumerated(EnumType.STRING)
-    private String careType;
+    private CareType careType;
 
     @Column
     private String diary;
