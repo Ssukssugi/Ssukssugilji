@@ -29,7 +29,7 @@ public class DiaryService {
             Diary.builder()
                 .plantId(request.getPlantId())
                 .date(request.getDate())
-                .careType(request.getCareType().toString())
+                .careType(request.getCareType())
                 .diary(request.getDiary())
                 .imageUrl(imageUrl)
                 .build()
