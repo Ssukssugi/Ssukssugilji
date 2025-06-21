@@ -31,7 +31,7 @@ public class DiaryService {
 
         Diary diary = Diary.builder()
             .date(request.getDate())
-            .careType(request.getCareType())
+            .careTypes(request.getCareTypes())
             .diary(request.getDiary())
             .imageUrl(imageUrl)
             .build();

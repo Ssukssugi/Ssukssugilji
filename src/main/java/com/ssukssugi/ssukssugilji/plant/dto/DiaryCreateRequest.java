@@ -2,6 +2,7 @@ package com.ssukssugi.ssukssugilji.plant.dto;
 
 import com.ssukssugi.ssukssugilji.plant.entity.CareType;
 import java.time.LocalDate;
+import java.util.List;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -10,7 +11,7 @@ public class DiaryCreateRequest {
 
     private Long plantId;
     private LocalDate date;
-    private CareType careType;
+    private List<CareType> careTypes;
     private String diary;
     private MultipartFile plantImage;
 }
