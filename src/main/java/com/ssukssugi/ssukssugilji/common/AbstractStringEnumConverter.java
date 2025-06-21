@@ -1,6 +1,7 @@
 package com.ssukssugi.ssukssugilji.common;
 
 import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
+@Converter
 public abstract class AbstractStringEnumConverter<T extends Enum<T>> implements
     AttributeConverter<List<T>, String> {
 
