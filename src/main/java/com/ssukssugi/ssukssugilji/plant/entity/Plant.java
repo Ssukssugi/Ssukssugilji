@@ -6,6 +6,8 @@ import com.ssukssugi.ssukssugilji.user.entity.User;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -42,20 +44,15 @@ public class Plant extends BaseEntity {
     private String name;
 
     @JoinColumn(name = "userId")
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
     @Column
     private Short shine;
 
     @Column
-    private Short wind;
-
-    @Column
+    @Enumerated(EnumType.STRING)
     private Place place;
-
-    @Column
-    private Boolean secret;
 
     @OneToMany(mappedBy = "plant", cascade = CascadeType.ALL)
     private List<Diary> diaries = new ArrayList<>();

@@ -5,8 +5,7 @@ import lombok.Data;
 @Data
 public class UserPlantCreateRequest {
 
-    private String plantCategory;
     private String name;
+    private String plantCategory;
     private PlantEnvironment plantEnvironment;
-    private Boolean secret;
 }

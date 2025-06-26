@@ -5,6 +5,7 @@ import com.ssukssugi.ssukssugilji.plant.dto.UserPlantCreateRequest;
 import com.ssukssugi.ssukssugilji.plant.dto.UserPlantDto;
 import com.ssukssugi.ssukssugilji.plant.dto.UserPlantListDto;
 import com.ssukssugi.ssukssugilji.plant.service.PlantService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,7 +30,8 @@ public class PlantController {
     }
 
     @PostMapping
-    public ResponseEntity<Boolean> createUserPlant(@RequestBody UserPlantCreateRequest request) {
+    public ResponseEntity<Boolean> createUserPlant(
+        @Valid @RequestBody UserPlantCreateRequest request) {
         plantService.createPlant(request);
         return ResponseEntity.ok(true);
     }
