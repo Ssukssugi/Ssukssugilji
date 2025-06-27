@@ -2,7 +2,9 @@ package com.ssukssugi.ssukssugilji.plant.dto;
 
 import com.ssukssugi.ssukssugilji.plant.entity.Plant;
 import lombok.Builder;
+import lombok.Data;
 
+@Data
 @Builder
 public class UserPlantDto {
 
