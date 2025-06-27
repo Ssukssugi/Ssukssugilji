@@ -6,5 +6,5 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface PlantCategoryRepository extends CrudRepository<PlantCategory, Long> {
 
-    List<PlantCategory> findByNameContaining(String keyword);
+    List<PlantCategory> findByNameLike(String keyword);
 }

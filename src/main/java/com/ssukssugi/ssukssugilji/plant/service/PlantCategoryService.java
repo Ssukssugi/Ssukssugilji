@@ -14,9 +14,13 @@ public class PlantCategoryService {
     private final PlantCategoryRepository plantCategoryRepository;
 
     public List<String> searchPlantCategory(String keyword) {
-        return plantCategoryRepository.findByNameContaining(keyword)
+        return plantCategoryRepository.findByNameLike(wrap(keyword))
             .stream()
             .map(PlantCategory::getName)
             .collect(Collectors.toList());
+    }
+
+    private String wrap(String str) {
+        return "%" + str + "%";
     }
 }
