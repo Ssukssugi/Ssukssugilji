@@ -1,12 +1,15 @@
 package com.ssukssugi.ssukssugilji.plant.controller;
 
+import com.ssukssugi.ssukssugilji.plant.dto.DiaryByMonthListDto;
 import com.ssukssugi.ssukssugilji.plant.dto.DiaryCreateRequest;
 import com.ssukssugi.ssukssugilji.plant.service.DiaryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -20,5 +23,11 @@ public class DiaryController {
     public ResponseEntity<Boolean> createDiary(@RequestBody DiaryCreateRequest request) {
         diaryService.createDiary(request);
         return ResponseEntity.ok(true);
+    }
+
+    @GetMapping("/by-month")
+    public ResponseEntity<DiaryByMonthListDto> getDiaryListByMonth(
+        @RequestParam("plantId") Long plantId) {
+        return ResponseEntity.ok(diaryService.getDiaryListByMonth(plantId));
     }
 }

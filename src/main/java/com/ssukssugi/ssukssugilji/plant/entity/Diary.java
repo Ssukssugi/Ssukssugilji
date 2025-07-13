@@ -1,5 +1,6 @@
 package com.ssukssugi.ssukssugilji.plant.entity;
 
+import com.ssukssugi.ssukssugilji.common.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -24,7 +25,7 @@ import lombok.Setter;
 @Builder
 @Getter
 @Setter
-public class Diary {
+public class Diary extends BaseEntity {
 
     @Id
     @GeneratedValue
