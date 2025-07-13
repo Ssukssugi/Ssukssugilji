@@ -2,16 +2,18 @@ package com.ssukssugi.ssukssugilji.plant.controller;
 
 import com.ssukssugi.ssukssugilji.auth.service.SecurityUtil;
 import com.ssukssugi.ssukssugilji.plant.dto.PlantProfileDto;
-import com.ssukssugi.ssukssugilji.plant.dto.UserPlantCreateRequest;
 import com.ssukssugi.ssukssugilji.plant.dto.UserPlantDto;
 import com.ssukssugi.ssukssugilji.plant.dto.UserPlantListDto;
+import com.ssukssugi.ssukssugilji.plant.dto.UserPlantUpsertRequest;
 import com.ssukssugi.ssukssugilji.plant.service.PlantService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -38,13 +40,26 @@ public class PlantController {
 
     @PostMapping
     public ResponseEntity<Boolean> createUserPlant(
-        @Valid @RequestBody UserPlantCreateRequest request) {
+        @Valid @RequestBody UserPlantUpsertRequest request) {
         plantService.createPlant(request);
+        return ResponseEntity.ok(true);
+    }
+
+    @PutMapping
+    public ResponseEntity<Boolean> updateUserPlant(
+        @Valid @RequestBody UserPlantUpsertRequest request, @RequestParam("plantId") Long plantId) {
+        plantService.updatePlant(plantId, request);
         return ResponseEntity.ok(true);
     }
 
     @GetMapping("/{plantId}")
     public ResponseEntity<UserPlantDto> getUserPlantInfo(@PathVariable("plantId") Long plantId) {
         return ResponseEntity.ok(plantService.getUserPlantInfo(plantId));
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Boolean> deleteUserPlant(@RequestParam("plantId") Long plantId) {
+        plantService.deletePlant(plantId);
+        return ResponseEntity.ok(true);
     }
 }

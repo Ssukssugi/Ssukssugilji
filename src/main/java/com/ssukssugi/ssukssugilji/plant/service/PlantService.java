@@ -6,8 +6,8 @@ import com.ssukssugi.ssukssugilji.plant.dao.PlantRepository;
 import com.ssukssugi.ssukssugilji.plant.dto.DiaryByMonthListDto;
 import com.ssukssugi.ssukssugilji.plant.dto.DiaryCreateRequest;
 import com.ssukssugi.ssukssugilji.plant.dto.PlantProfileDto;
-import com.ssukssugi.ssukssugilji.plant.dto.UserPlantCreateRequest;
 import com.ssukssugi.ssukssugilji.plant.dto.UserPlantDto;
+import com.ssukssugi.ssukssugilji.plant.dto.UserPlantUpsertRequest;
 import com.ssukssugi.ssukssugilji.plant.entity.Diary;
 import com.ssukssugi.ssukssugilji.plant.entity.Plant;
 import com.ssukssugi.ssukssugilji.user.entity.User;
@@ -45,7 +45,7 @@ public class PlantService {
     }
 
     @Transactional
-    public void createPlant(UserPlantCreateRequest request) {
+    public void createPlant(UserPlantUpsertRequest request) {
         plantRepository.save(Plant.builder()
             .name(request.getName())
             .plantCategory(request.getPlantCategory())
@@ -72,5 +72,18 @@ public class PlantService {
 
     public void createDiary(DiaryCreateRequest request) {
         diaryService.createDiary(request, getById(request.getPlantId()));
+    }
+
+    public void deletePlant(Long plantId) {
+        plantRepository.deleteById(plantId);
+    }
+
+    @Transactional
+    public void updatePlant(Long plantId, UserPlantUpsertRequest request) {
+        Plant plant = getById(plantId);
+        plant.setName(request.getName());
+        plant.setPlantCategory(request.getPlantCategory());
+        plant.setShine(request.getPlantEnvironment().getShine());
+        plant.setPlace(request.getPlantEnvironment().getPlace());
     }
 }
