@@ -2,7 +2,7 @@ package com.ssukssugi.ssukssugilji.plant.controller;
 
 import com.ssukssugi.ssukssugilji.plant.dto.DiaryByMonthListDto;
 import com.ssukssugi.ssukssugilji.plant.dto.DiaryCreateRequest;
-import com.ssukssugi.ssukssugilji.plant.service.DiaryService;
+import com.ssukssugi.ssukssugilji.plant.service.PlantService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,17 +17,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class DiaryController {
 
-    private final DiaryService diaryService;
+    private final PlantService plantService;
 
     @PostMapping
     public ResponseEntity<Boolean> createDiary(@RequestBody DiaryCreateRequest request) {
-        diaryService.createDiary(request);
+        plantService.createDiary(request);
         return ResponseEntity.ok(true);
     }
 
     @GetMapping("/by-month")
     public ResponseEntity<DiaryByMonthListDto> getDiaryListByMonth(
         @RequestParam("plantId") Long plantId) {
-        return ResponseEntity.ok(diaryService.getDiaryListByMonth(plantId));
+        return ResponseEntity.ok(plantService.getDiaryListByMonth(plantId));
     }
 }

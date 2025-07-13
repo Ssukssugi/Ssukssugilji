@@ -27,14 +27,12 @@ public class DiaryService {
 
     private final DiaryRepository diaryRepository;
     private final CloudflareR2Service cloudflareR2Service;
-    private final PlantService plantService;
 
     private static final String dir = "plant_diary/";
 
     @Transactional
-    public void createDiary(DiaryCreateRequest request) {
+    public void createDiary(DiaryCreateRequest request, Plant plant) {
         String imageUrl = buildImageUrl(request);
-        Plant plant = plantService.getById(request.getPlantId());
 
         Diary diary = Diary.builder()
             .date(request.getDate())
@@ -61,12 +59,12 @@ public class DiaryService {
             + "_" + UUID.randomUUID();
     }
 
-    public Optional<Diary> getMostRecent(Long plantId) {
-        return diaryRepository.findTopByPlantIdOrderByCreatedAtDesc(plantId);
+    public Optional<Diary> getMostRecent(Plant plant) {
+        return diaryRepository.findTopByPlantOrderByCreatedAtDesc(plant);
     }
 
-    public DiaryByMonthListDto getDiaryListByMonth(Long plantId) {
-        List<Diary> diaries = diaryRepository.findByPlantId(plantId);
+    public DiaryByMonthListDto getDiaryListByMonth(Plant plant) {
+        List<Diary> diaries = diaryRepository.findByPlant(plant);
         DiaryByMonthListDto diaryByMonthListDto = new DiaryByMonthListDto();
         diaryByMonthListDto.setByMonth(
             diaries.stream()

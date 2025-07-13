@@ -3,6 +3,8 @@ package com.ssukssugi.ssukssugilji.plant.service;
 import com.ssukssugi.ssukssugilji.auth.service.SecurityUtil;
 import com.ssukssugi.ssukssugilji.common.BaseEntity;
 import com.ssukssugi.ssukssugilji.plant.dao.PlantRepository;
+import com.ssukssugi.ssukssugilji.plant.dto.DiaryByMonthListDto;
+import com.ssukssugi.ssukssugilji.plant.dto.DiaryCreateRequest;
 import com.ssukssugi.ssukssugilji.plant.dto.PlantProfileDto;
 import com.ssukssugi.ssukssugilji.plant.dto.UserPlantCreateRequest;
 import com.ssukssugi.ssukssugilji.plant.dto.UserPlantDto;
@@ -54,13 +56,21 @@ public class PlantService {
     }
 
     public PlantProfileDto getPlantProfile(Long plantId) {
-        Plant entity = getById(plantId);
-        Optional<Diary> mostRecent = diaryService.getMostRecent(plantId);
+        Plant plant = getById(plantId);
+        Optional<Diary> mostRecent = diaryService.getMostRecent(plant);
         return PlantProfileDto.builder()
-            .name(entity.getName())
-            .plantCategory(entity.getPlantCategory())
+            .name(plant.getName())
+            .plantCategory(plant.getPlantCategory())
             .plantImage(mostRecent.map(Diary::getImageUrl).orElse(null))
-            .shine(entity.getShine())
+            .shine(plant.getShine())
             .build();
+    }
+
+    public DiaryByMonthListDto getDiaryListByMonth(Long plantId) {
+        return diaryService.getDiaryListByMonth(getById(plantId));
+    }
+
+    public void createDiary(DiaryCreateRequest request) {
+        diaryService.createDiary(request, getById(request.getPlantId()));
     }
 }
