@@ -12,6 +12,7 @@ import lombok.Data;
 @Builder
 public class DiaryDto {
 
+    private Long diaryId;
     private LocalDate date;
     private String image;
     private String content;
@@ -19,6 +20,7 @@ public class DiaryDto {
 
     private static DiaryDto fromEntity(Diary entity) {
         return DiaryDto.builder()
+            .diaryId(entity.getDiaryId())
             .date(entity.getDate())
             .image(entity.getImageUrl())
             .content(entity.getDiary())
