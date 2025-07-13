@@ -1,6 +1,7 @@
 package com.ssukssugi.ssukssugilji.plant.controller;
 
 import com.ssukssugi.ssukssugilji.auth.service.SecurityUtil;
+import com.ssukssugi.ssukssugilji.plant.dto.PlantProfileDto;
 import com.ssukssugi.ssukssugilji.plant.dto.UserPlantCreateRequest;
 import com.ssukssugi.ssukssugilji.plant.dto.UserPlantDto;
 import com.ssukssugi.ssukssugilji.plant.dto.UserPlantListDto;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -27,6 +29,11 @@ public class PlantController {
         UserPlantListDto response = new UserPlantListDto();
         response.setPlants(plantService.getUserPlantList(SecurityUtil.getUser()));
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/profile")
+    public ResponseEntity<PlantProfileDto> getPlantProfile(@RequestParam("plantId") Long plantId) {
+        return ResponseEntity.ok(plantService.getPlantProfile(plantId));
     }
 
     @PostMapping
