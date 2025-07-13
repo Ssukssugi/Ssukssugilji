@@ -2,6 +2,10 @@ spring:
   config:
     import:
       - classpath:application-local.yml
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 10MB
   jpa:
     hibernate:
       naming:
