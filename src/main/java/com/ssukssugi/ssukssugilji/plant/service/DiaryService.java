@@ -95,4 +95,8 @@ public class DiaryService {
         );
         return diaryByMonthListDto;
     }
+
+    public void deleteDiary(Long diaryId) {
+        diaryRepository.deleteById(diaryId);
+    }
 }
