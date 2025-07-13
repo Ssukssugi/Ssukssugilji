@@ -6,10 +6,10 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-public class DiaryCreateRequest {
+public class DiaryUpdateRequest {
 
-    private Long plantId;
     private LocalDate date;
     private List<CareType> careTypes;
     private String diary;
+    private Boolean updateImage;
 }

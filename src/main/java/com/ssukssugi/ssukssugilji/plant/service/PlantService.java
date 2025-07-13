@@ -5,6 +5,7 @@ import com.ssukssugi.ssukssugilji.common.BaseEntity;
 import com.ssukssugi.ssukssugilji.plant.dao.PlantRepository;
 import com.ssukssugi.ssukssugilji.plant.dto.DiaryByMonthListDto;
 import com.ssukssugi.ssukssugilji.plant.dto.DiaryCreateRequest;
+import com.ssukssugi.ssukssugilji.plant.dto.DiaryUpdateRequest;
 import com.ssukssugi.ssukssugilji.plant.dto.PlantProfileDto;
 import com.ssukssugi.ssukssugilji.plant.dto.UserPlantDto;
 import com.ssukssugi.ssukssugilji.plant.dto.UserPlantUpsertRequest;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -70,8 +72,12 @@ public class PlantService {
         return diaryService.getDiaryListByMonth(getById(plantId));
     }
 
-    public void createDiary(DiaryCreateRequest request) {
-        diaryService.createDiary(request, getById(request.getPlantId()));
+    public void createDiary(DiaryCreateRequest request, MultipartFile image) {
+        diaryService.createDiary(request, getById(request.getPlantId()), image);
+    }
+
+    public void updateDiary(Long diaryId, DiaryUpdateRequest request, MultipartFile image) {
+        diaryService.updateDiary(diaryId, request, image);
     }
 
     public void deletePlant(Long plantId) {

@@ -6,8 +6,10 @@ import com.ssukssugi.ssukssugilji.plant.dto.DiaryByMonthDto;
 import com.ssukssugi.ssukssugilji.plant.dto.DiaryByMonthListDto;
 import com.ssukssugi.ssukssugilji.plant.dto.DiaryCreateRequest;
 import com.ssukssugi.ssukssugilji.plant.dto.DiaryDto;
+import com.ssukssugi.ssukssugilji.plant.dto.DiaryUpdateRequest;
 import com.ssukssugi.ssukssugilji.plant.entity.Diary;
 import com.ssukssugi.ssukssugilji.plant.entity.Plant;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
@@ -19,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -30,9 +33,15 @@ public class DiaryService {
 
     private static final String dir = "plant_diary/";
 
+    private Diary getById(Long diaryId) {
+        return diaryRepository.findById(diaryId)
+            .orElseThrow(
+                () -> new IllegalArgumentException("Diary not found, diaryId = " + diaryId));
+    }
+
     @Transactional
-    public void createDiary(DiaryCreateRequest request, Plant plant) {
-        String imageUrl = buildImageUrl(request);
+    public void createDiary(DiaryCreateRequest request, Plant plant, MultipartFile image) {
+        String imageUrl = buildImageUrl(request.getPlantId(), request.getDate());
 
         Diary diary = Diary.builder()
             .date(request.getDate())
@@ -44,7 +53,7 @@ public class DiaryService {
         Diary entity = diaryRepository.save(diary);
 
         try {
-            cloudflareR2Service.uploadFile(imageUrl, request.getPlantImage());
+            cloudflareR2Service.uploadFile(imageUrl, image);
         } catch (Exception e) {
             throw new RuntimeException(
                 "Failed to upload file in Cloudflare R2 service, diaryId: " + entity.getDiaryId(),
@@ -52,10 +61,32 @@ public class DiaryService {
         }
     }
 
-    private static String buildImageUrl(DiaryCreateRequest request) {
+    @Transactional
+    public void updateDiary(Long diaryId, DiaryUpdateRequest request, MultipartFile image) {
+        Diary diary = getById(diaryId);
+
+        diary.setDate(request.getDate());
+        diary.setCareTypes(request.getCareTypes());
+        diary.setDiary(request.getDiary());
+        if (request.getUpdateImage()) {
+            String imageUrl = buildImageUrl(diary.getPlant().getPlantId(), request.getDate());
+            diary.setImageUrl(imageUrl);
+
+            try {
+                cloudflareR2Service.uploadFile(imageUrl, image);
+            } catch (Exception e) {
+                throw new RuntimeException(
+                    "Failed to upload file in Cloudflare R2 service, diaryId: "
+                        + diary.getDiaryId(),
+                    e);
+            }
+        }
+    }
+
+    private static String buildImageUrl(Long plantId, LocalDate date) {
         return dir
-            + request.getPlantId()
-            + request.getDate().format(DateTimeFormatter.ISO_LOCAL_DATE)
+            + plantId
+            + date.format(DateTimeFormatter.ISO_LOCAL_DATE)
             + "_" + UUID.randomUUID();
     }
 
