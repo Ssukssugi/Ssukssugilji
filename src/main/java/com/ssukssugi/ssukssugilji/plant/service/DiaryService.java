@@ -85,9 +85,10 @@ public class DiaryService {
 
     private static String buildImageUrl(Long plantId, LocalDate date) {
         return dir
-            + plantId
-            + date.format(DateTimeFormatter.ISO_LOCAL_DATE)
-            + "_" + UUID.randomUUID();
+            + plantId + "_"
+            + date.format(DateTimeFormatter.ISO_LOCAL_DATE) + "_"
+            + UUID.randomUUID()
+            + ".jpeg";
     }
 
     public Optional<Diary> getMostRecent(Plant plant) {
