@@ -28,7 +28,8 @@ public class DiaryController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Boolean> createDiary(
-        @RequestPart DiaryCreateRequest request, @RequestPart("plantImage") MultipartFile image) {
+        @RequestPart("request") DiaryCreateRequest request,
+        @RequestPart("plantImage") MultipartFile image) {
         plantService.createDiary(request, image);
         return ResponseEntity.ok(true);
     }
@@ -36,7 +37,7 @@ public class DiaryController {
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Boolean> updateDiary(
         @RequestParam("diaryId") Long diaryId,
-        @RequestPart DiaryUpdateRequest request,
+        @RequestPart("request") DiaryUpdateRequest request,
         @RequestPart("plantImage") MultipartFile image) {
         plantService.updateDiary(diaryId, request, image);
         return ResponseEntity.ok(true);
