@@ -4,8 +4,9 @@ spring:
       - classpath:application-local.yml
   servlet:
     multipart:
-      max-file-size: 5MB
-      max-request-size: 10MB
+      enabled: true
+      max-file-size: 30MB
+      max-request-size: 30MB
   jpa:
     hibernate:
       naming:
