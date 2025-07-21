@@ -13,6 +13,7 @@ import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.S3Configuration;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
@@ -37,7 +38,9 @@ public class CloudflareR2Service {
             .endpointOverride(URI.create(endpoint))
             .credentialsProvider(
                 StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKey, secretKey)))
-            .region(Region.US_EAST_1) // Cloudflare R2는 리전이 필요 없지만 AWS SDK 특성상 설정 필요
+//            .region(Region.US_EAST_1) // Cloudflare R2는 리전이 필요 없지만 AWS SDK 특성상 설정 필요
+            .region(Region.of("auto"))
+            .serviceConfiguration(S3Configuration.builder().pathStyleAccessEnabled(true).build())
             .build();
     }
 
