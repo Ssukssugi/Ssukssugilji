@@ -3,8 +3,8 @@ package com.ssukssugi.ssukssugilji.common;
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.net.URI;
-import java.nio.ByteBuffer;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,6 +19,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CloudflareR2Service {
 
     private S3Client s3Client;
@@ -38,13 +39,15 @@ public class CloudflareR2Service {
             .endpointOverride(URI.create(endpoint))
             .credentialsProvider(
                 StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKey, secretKey)))
-//            .region(Region.US_EAST_1) // Cloudflare R2는 리전이 필요 없지만 AWS SDK 특성상 설정 필요
-            .region(Region.of("auto"))
+            .region(Region.US_EAST_1) // Cloudflare R2는 리전이 필요 없지만 AWS SDK 특성상 설정 필요
             .serviceConfiguration(S3Configuration.builder().pathStyleAccessEnabled(true).build())
             .build();
     }
 
     public String uploadFile(String fileName, MultipartFile file) throws IOException {
+        log.info("Uploading file: {}", file);
+        log.info("Content-Type: {}", file.getContentType());
+        log.info("File size: {}", file.getSize());
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
             .bucket(bucketName)
             .key(fileName)
@@ -52,7 +55,7 @@ public class CloudflareR2Service {
             .build();
 
         PutObjectResponse response = s3Client.putObject(putObjectRequest,
-            RequestBody.fromByteBuffer(ByteBuffer.wrap(file.getBytes())));
+            RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
 
         if (response.sdkHttpResponse().isSuccessful()) {
             return fileName;

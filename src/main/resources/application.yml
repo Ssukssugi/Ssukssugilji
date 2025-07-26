@@ -11,3 +11,6 @@ spring:
     hibernate:
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+server:
+  tomcat:
+    max-swallow-size: -1
