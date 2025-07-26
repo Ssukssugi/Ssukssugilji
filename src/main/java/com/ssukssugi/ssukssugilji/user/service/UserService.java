@@ -95,5 +95,6 @@ public class UserService {
             case SERVICE_NOTI -> user.setReceiveServiceNoti(request.getValue());
             default -> throw new RuntimeException("Invalid User Toggle Key: " + request.getKey());
         }
+        userRepository.save(user);
     }
 }
