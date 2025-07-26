@@ -32,7 +32,14 @@ public class PlantService {
         return plantRepository.findByUser(user)
             .stream()
             .sorted(Comparator.comparing(BaseEntity::getCreatedAt).reversed())
-            .map(UserPlantDto::fromEntity)
+            .map(plant -> {
+                // TODO: resolve N+1 issue!
+                String image = diaryService.getMostRecent(plant).map(Diary::getImageUrl)
+                    .orElse(null);
+                UserPlantDto userPlantDto = UserPlantDto.fromEntity(plant);
+                userPlantDto.setImage(image);
+                return userPlantDto;
+            })
             .collect(Collectors.toList());
     }
 
@@ -65,6 +72,7 @@ public class PlantService {
             .plantCategory(plant.getPlantCategory())
             .plantImage(mostRecent.map(Diary::getImageUrl).orElse(null))
             .shine(plant.getShine())
+            .place(plant.getPlace())
             .build();
     }
 
@@ -77,7 +85,8 @@ public class PlantService {
     }
 
     public void updateDiary(Long diaryId, DiaryUpdateRequest request, MultipartFile image) {
-        diaryService.updateDiary(diaryId, request, image);
+        Plant plant = getById(request.getPlantId());
+        diaryService.updateDiary(plant, diaryId, request, image);
     }
 
     public void deletePlant(Long plantId) {

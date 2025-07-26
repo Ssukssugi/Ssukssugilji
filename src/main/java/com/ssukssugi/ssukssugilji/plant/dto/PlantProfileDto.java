@@ -11,4 +11,5 @@ public class PlantProfileDto {
     private String plantCategory;
     private String plantImage;
     private Short shine;
+    private Place place;
 }

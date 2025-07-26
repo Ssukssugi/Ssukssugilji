@@ -11,6 +11,7 @@ public class UserPlantDto {
     private Long plantId;
     private String name;
     private String plantCategory;
+    private String image;
 
     public static UserPlantDto fromEntity(Plant entity) {
         return UserPlantDto.builder()

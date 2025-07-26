@@ -62,12 +62,15 @@ public class DiaryService {
     }
 
     @Transactional
-    public void updateDiary(Long diaryId, DiaryUpdateRequest request, MultipartFile image) {
+    public void updateDiary(
+        Plant plant, Long diaryId, DiaryUpdateRequest request, MultipartFile image) {
         Diary diary = getById(diaryId);
 
         diary.setDate(request.getDate());
         diary.setCareTypes(request.getCareTypes());
         diary.setDiary(request.getDiary());
+        diary.getPlant().deleteDiary(diary);
+        plant.addDiary(diary);
         if (request.getUpdateImage()) {
             String imageUrl = buildImageUrl(diary.getPlant().getPlantId(), request.getDate());
             diary.setImageUrl(imageUrl);
