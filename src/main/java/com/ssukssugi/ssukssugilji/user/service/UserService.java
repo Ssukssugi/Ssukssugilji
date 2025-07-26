@@ -5,6 +5,8 @@ import com.ssukssugi.ssukssugilji.user.dao.UserRepository;
 import com.ssukssugi.ssukssugilji.user.dto.SocialAuthUserInfoDto;
 import com.ssukssugi.ssukssugilji.user.dto.TermsAgreement;
 import com.ssukssugi.ssukssugilji.user.dto.UserDetailDto;
+import com.ssukssugi.ssukssugilji.user.dto.profile.UserProfileDto;
+import com.ssukssugi.ssukssugilji.user.dto.profile.UserProfileUpdateRequest;
 import com.ssukssugi.ssukssugilji.user.entity.User;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -66,5 +68,17 @@ public class UserService {
     public void withdraw(User user) {
         userRepository.delete(user);
         userDetailService.deleteByUserIfExist(user);
+    }
+
+    public UserProfileDto getUserProfile() {
+        UserProfileDto userProfileDto = new UserProfileDto();
+        userProfileDto.setNickname(SecurityUtil.getUser().getNickname());
+        return userProfileDto;
+    }
+
+    public void updateUserProfile(UserProfileUpdateRequest request) {
+        User user = SecurityUtil.getUser();
+        user.setNickname(request.getNickname());
+        userRepository.save(user);
     }
 }
