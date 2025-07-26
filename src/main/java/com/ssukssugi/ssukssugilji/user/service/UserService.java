@@ -7,6 +7,8 @@ import com.ssukssugi.ssukssugilji.user.dto.TermsAgreement;
 import com.ssukssugi.ssukssugilji.user.dto.UserDetailDto;
 import com.ssukssugi.ssukssugilji.user.dto.profile.UserProfileDto;
 import com.ssukssugi.ssukssugilji.user.dto.profile.UserProfileUpdateRequest;
+import com.ssukssugi.ssukssugilji.user.dto.setting.UserSettingDto;
+import com.ssukssugi.ssukssugilji.user.dto.setting.UserToggleSetRequest;
 import com.ssukssugi.ssukssugilji.user.entity.User;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -80,5 +82,18 @@ public class UserService {
         User user = SecurityUtil.getUser();
         user.setNickname(request.getNickname());
         userRepository.save(user);
+    }
+
+    public UserSettingDto getUserSettings() {
+        return UserSettingDto.fromEntity(SecurityUtil.getUser());
+    }
+
+    public void setUserToggle(UserToggleSetRequest request) {
+        User user = SecurityUtil.getUser();
+        switch (request.getKey()) {
+            case MARKETING -> user.setAgreeToReceiveMarketing(request.getValue());
+            case SERVICE_NOTI -> user.setReceiveServiceNoti(request.getValue());
+            default -> throw new RuntimeException("Invalid User Toggle Key: " + request.getKey());
+        }
     }
 }

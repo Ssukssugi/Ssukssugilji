@@ -45,6 +45,9 @@ public class User extends BaseEntity {
     private Boolean agreeToReceiveMarketing;
 
     @Column
+    private Boolean receiveServiceNoti;
+
+    @Column
     private String nickname;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
