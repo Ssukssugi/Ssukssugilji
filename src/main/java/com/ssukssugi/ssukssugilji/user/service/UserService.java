@@ -42,6 +42,7 @@ public class UserService {
             .loginType(socialAuthUserInfoDto.getLoginType())
             .emailAddress(socialAuthUserInfoDto.getEmailAddress())
             .socialId(socialAuthUserInfoDto.getSocialId())
+            .receiveServiceNoti(true)
             .build();
     }
 

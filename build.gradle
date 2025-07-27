@@ -64,6 +64,7 @@ dependencies {
 
     // R2
     implementation 'software.amazon.awssdk:s3:2.26.21'
+    // issue: https://community.cloudflare.com/t/the-request-signature-we-calculated-does-not-match-the-signature-you-provided/773465
 }
 
 tasks.named('test') {
