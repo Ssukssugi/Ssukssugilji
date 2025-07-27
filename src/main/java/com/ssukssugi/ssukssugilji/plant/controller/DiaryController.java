@@ -2,7 +2,9 @@ package com.ssukssugi.ssukssugilji.plant.controller;
 
 import com.ssukssugi.ssukssugilji.plant.dto.DiaryByMonthListDto;
 import com.ssukssugi.ssukssugilji.plant.dto.DiaryCreateRequest;
+import com.ssukssugi.ssukssugilji.plant.dto.DiaryCreateResponse;
 import com.ssukssugi.ssukssugilji.plant.dto.DiaryUpdateRequest;
+import com.ssukssugi.ssukssugilji.plant.entity.Diary;
 import com.ssukssugi.ssukssugilji.plant.service.DiaryService;
 import com.ssukssugi.ssukssugilji.plant.service.PlantService;
 import lombok.RequiredArgsConstructor;
@@ -27,11 +29,11 @@ public class DiaryController {
     private final DiaryService diaryService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Boolean> createDiary(
+    public ResponseEntity<DiaryCreateResponse> createDiary(
         @RequestPart("request") DiaryCreateRequest request,
         @RequestPart("plantImage") MultipartFile image) {
-        plantService.createDiary(request, image);
-        return ResponseEntity.ok(true);
+        Diary diary = plantService.createDiary(request, image);
+        return ResponseEntity.ok(DiaryCreateResponse.fromEntity(diary));
     }
 
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

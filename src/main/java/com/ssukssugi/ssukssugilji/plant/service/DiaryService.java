@@ -31,7 +31,7 @@ public class DiaryService {
     private final DiaryRepository diaryRepository;
     private final CloudflareR2Service cloudflareR2Service;
 
-    private static final String dir = "plant_diary/";
+    private static final String PLANT_DIARY_DIR = "/plant_diary/";
 
     private Diary getById(Long diaryId) {
         return diaryRepository.findById(diaryId)
@@ -40,7 +40,7 @@ public class DiaryService {
     }
 
     @Transactional
-    public void createDiary(DiaryCreateRequest request, Plant plant, MultipartFile image) {
+    public Diary createDiary(DiaryCreateRequest request, Plant plant, MultipartFile image) {
         String imageUrl = buildImageUrl(request.getPlantId(), request.getDate());
 
         Diary diary = Diary.builder()
@@ -59,6 +59,8 @@ public class DiaryService {
                 "Failed to upload file in Cloudflare R2 service, diaryId: " + entity.getDiaryId(),
                 e);
         }
+
+        return entity;
     }
 
     @Transactional
@@ -87,7 +89,7 @@ public class DiaryService {
     }
 
     private static String buildImageUrl(Long plantId, LocalDate date) {
-        return dir
+        return PLANT_DIARY_DIR
             + plantId + "_"
             + date.format(DateTimeFormatter.ISO_LOCAL_DATE) + "_"
             + UUID.randomUUID()
