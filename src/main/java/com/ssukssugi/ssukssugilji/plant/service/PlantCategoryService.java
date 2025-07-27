@@ -14,13 +14,9 @@ public class PlantCategoryService {
     private final PlantCategoryRepository plantCategoryRepository;
 
     public List<PlantCategoryDto> searchPlantCategory(String keyword) {
-        return plantCategoryRepository.findByNameLike(wrap(keyword))
+        return plantCategoryRepository.search(keyword)
             .stream()
             .map(PlantCategoryDto::fromEntity)
             .collect(Collectors.toList());
-    }
-
-    private String wrap(String str) {
-        return "%" + str + "%";
     }
 }
