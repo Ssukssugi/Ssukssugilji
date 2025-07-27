@@ -45,9 +45,6 @@ public class CloudflareR2Service {
     }
 
     public String uploadFile(String fileName, MultipartFile file) throws IOException {
-        log.info("Uploading file: {}", file);
-        log.info("Content-Type: {}", file.getContentType());
-        log.info("File size: {}", file.getSize());
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
             .bucket(bucketName)
             .key(fileName)

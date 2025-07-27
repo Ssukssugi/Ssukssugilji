@@ -45,7 +45,7 @@ public class User extends BaseEntity {
     private Boolean agreeToReceiveMarketing;
 
     @Column
-    private Boolean receiveServiceNoti;
+    private Boolean receiveServiceNoti = true;
 
     @Column
     private String nickname;
