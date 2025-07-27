@@ -2,7 +2,9 @@ package com.ssukssugi.ssukssugilji.common;
 
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
+@Component
 public class R2Util {
 
     private static String STATIC_PUBLIC_URL;
