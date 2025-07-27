@@ -1,5 +1,6 @@
 package com.ssukssugi.ssukssugilji.plant.dto;
 
+import com.ssukssugi.ssukssugilji.common.R2Util;
 import com.ssukssugi.ssukssugilji.plant.entity.CareType;
 import com.ssukssugi.ssukssugilji.plant.entity.Diary;
 import java.time.LocalDate;
@@ -22,7 +23,7 @@ public class DiaryDto {
         return DiaryDto.builder()
             .diaryId(entity.getDiaryId())
             .date(entity.getDate())
-            .image(entity.getImageUrl())
+            .image(R2Util.toR2Url(entity.getImageUrl()))
             .content(entity.getDiary())
             .build();
     }

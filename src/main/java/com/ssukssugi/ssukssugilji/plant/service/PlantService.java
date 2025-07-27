@@ -2,6 +2,7 @@ package com.ssukssugi.ssukssugilji.plant.service;
 
 import com.ssukssugi.ssukssugilji.auth.service.SecurityUtil;
 import com.ssukssugi.ssukssugilji.common.BaseEntity;
+import com.ssukssugi.ssukssugilji.common.R2Util;
 import com.ssukssugi.ssukssugilji.plant.dao.PlantRepository;
 import com.ssukssugi.ssukssugilji.plant.dto.DiaryByMonthListDto;
 import com.ssukssugi.ssukssugilji.plant.dto.DiaryCreateRequest;
@@ -35,7 +36,7 @@ public class PlantService {
             .map(plant -> {
                 // TODO: resolve N+1 issue!
                 String image = diaryService.getMostRecent(plant).map(Diary::getImageUrl)
-                    .orElse(null);
+                    .map(R2Util::toR2Url).orElse(null);
                 UserPlantDto userPlantDto = UserPlantDto.fromEntity(plant);
                 userPlantDto.setImage(image);
                 return userPlantDto;
@@ -70,7 +71,7 @@ public class PlantService {
         return PlantProfileDto.builder()
             .name(plant.getName())
             .plantCategory(plant.getPlantCategory())
-            .plantImage(mostRecent.map(Diary::getImageUrl).orElse(null))
+            .plantImage(mostRecent.map(Diary::getImageUrl).map(R2Util::toR2Url).orElse(null))
             .shine(plant.getShine())
             .place(plant.getPlace())
             .build();
@@ -80,8 +81,8 @@ public class PlantService {
         return diaryService.getDiaryListByMonth(getById(plantId));
     }
 
-    public void createDiary(DiaryCreateRequest request, MultipartFile image) {
-        diaryService.createDiary(request, getById(request.getPlantId()), image);
+    public Diary createDiary(DiaryCreateRequest request, MultipartFile image) {
+        return diaryService.createDiary(request, getById(request.getPlantId()), image);
     }
 
     public void updateDiary(Long diaryId, DiaryUpdateRequest request, MultipartFile image) {
