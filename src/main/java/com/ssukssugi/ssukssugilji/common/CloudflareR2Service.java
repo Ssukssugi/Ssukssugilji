@@ -3,6 +3,7 @@ package com.ssukssugi.ssukssugilji.common;
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.net.URI;
+import java.security.InvalidParameterException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,9 +46,12 @@ public class CloudflareR2Service {
     }
 
     public String uploadFile(String fileName, MultipartFile file) throws IOException {
+        if (!fileName.startsWith("/")) {
+            throw new InvalidParameterException("File name must start with a slash (/)");
+        }
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
             .bucket(bucketName)
-            .key(fileName)
+            .key(fileName.substring(1))
             .contentType(file.getContentType())
             .build();
 
