@@ -40,7 +40,7 @@ public class DiaryController {
     public ResponseEntity<Boolean> updateDiary(
         @RequestParam("diaryId") Long diaryId,
         @RequestPart("request") DiaryUpdateRequest request,
-        @RequestPart("plantImage") MultipartFile image) {
+        @RequestPart(value = "plantImage", required = false) MultipartFile image) {
         plantService.updateDiary(diaryId, request, image);
         return ResponseEntity.ok(true);
     }
