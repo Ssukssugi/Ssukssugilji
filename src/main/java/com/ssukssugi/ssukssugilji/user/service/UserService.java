@@ -75,7 +75,7 @@ public class UserService {
 
     public UserProfileDto getUserProfile() {
         UserProfileDto userProfileDto = new UserProfileDto();
-        userProfileDto.setNickname(SecurityUtil.getUser().getNickname());
+        userProfileDto.setNickname(SecurityUtil.getUser().getUserDetail().getNickname());
         return userProfileDto;
     }
 
