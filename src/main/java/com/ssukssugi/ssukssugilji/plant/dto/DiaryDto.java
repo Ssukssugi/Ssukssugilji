@@ -25,6 +25,7 @@ public class DiaryDto {
             .date(entity.getDate())
             .image(R2Util.toR2Url(entity.getImageUrl()))
             .content(entity.getDiary())
+            .cares(entity.getCareTypes())
             .build();
     }
 
