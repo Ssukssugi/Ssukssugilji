@@ -10,7 +10,7 @@ import com.ssukssugi.ssukssugilji.user.entity.User;
 import com.ssukssugi.ssukssugilji.user.service.UserService;
 import com.ssukssugi.ssukssugilji.user.service.auth.SocialAuthContext;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.Objects;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -25,14 +25,14 @@ public class SocialLoginApplication {
     private final UserService userService;
     private final JwtService jwtService;
 
-    private final Long USER_ID_NOT_FOUND = -1L;
-
-    public SocialLoginResponse socialLogin(SocialLoginRequest request,
-        HttpServletResponse response) {
-        Long userId = findUserIdByAuthInfo(request.getLoginType(), request.getAccessToken());
-        boolean isRegistered = !Objects.equals(userId, USER_ID_NOT_FOUND);
+    public SocialLoginResponse socialLogin(
+        SocialLoginRequest request, HttpServletResponse response) {
+        Optional<User> user = findUserIdByAuthInfo(
+            request.getLoginType(), request.getAccessToken());
+        boolean isRegistered = user.isPresent();
         boolean existInfo = false;
         if (isRegistered) {
+            Long userId = user.get().getUserId();
             setTokenHeader(response, userId);
             existInfo = userService.checkIfUserInfoExist(userId);
             log.info("success to social-login, userId: {}, existInfo: {}", userId, existInfo);
@@ -45,12 +45,10 @@ public class SocialLoginApplication {
             .build();
     }
 
-    private Long findUserIdByAuthInfo(LoginType loginType, String accessToken) {
+    private Optional<User> findUserIdByAuthInfo(LoginType loginType, String accessToken) {
         SocialAuthUserInfoDto socialAuthUserInfoDto = socialAuthContext
             .getAuthUserInfo(loginType, accessToken);
-        return userService.getUserIdByAuthInfo(socialAuthUserInfoDto)
-            .map(User::getUserId)
-            .orElse(USER_ID_NOT_FOUND);
+        return userService.getUserIdByAuthInfo(socialAuthUserInfoDto);
     }
 
     @Transactional
