@@ -1,5 +1,6 @@
 package com.ssukssugi.ssukssugilji.common;
 
+import com.ssukssugi.ssukssugilji.common.error.exception.InvalidRequestException;
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.net.URI;
@@ -45,9 +46,10 @@ public class CloudflareR2Service {
     }
 
     public String uploadFile(String fileName, MultipartFile file) throws IOException {
+        validateFileName(fileName);
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
             .bucket(bucketName)
-            .key(fileName)
+            .key(fileName.substring(1))
             .contentType(file.getContentType())
             .build();
 
@@ -60,6 +62,13 @@ public class CloudflareR2Service {
             throw new RuntimeException(
                 "File upload failed: " + response.sdkHttpResponse().statusText()
                     .orElse("Unknown error"));
+        }
+    }
+
+    private void validateFileName(String fileName) {
+        if (!fileName.startsWith("/")) {
+            throw new InvalidRequestException(
+                "File name must start with a slash. Provided: " + fileName);
         }
     }
 }

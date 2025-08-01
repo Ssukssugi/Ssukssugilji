@@ -22,8 +22,7 @@ public class AuthController {
 
     @PostMapping("/social-login")
     public ResponseEntity<SocialLoginResponse> signIn(
-        HttpServletResponse httpServletResponse,
-        @RequestBody SocialLoginRequest request) {
+        HttpServletResponse httpServletResponse, @RequestBody SocialLoginRequest request) {
         return ResponseEntity.ok(socialLoginApplication.socialLogin(request, httpServletResponse));
     }
 
