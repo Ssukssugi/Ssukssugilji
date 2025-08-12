@@ -1,5 +1,6 @@
 package com.ssukssugi.ssukssugilji.plant.controller;
 
+import com.ssukssugi.ssukssugilji.plant.dto.PlantCategorySearchResultDto;
 import com.ssukssugi.ssukssugilji.plant.service.PlantCategoryService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +18,8 @@ public class PlantCategoryController {
     private final PlantCategoryService plantCategoryService;
 
     @GetMapping("/search")
-    public ResponseEntity<List<String>> searchPlantCategory(@RequestParam String keyword) {
+    public ResponseEntity<List<PlantCategorySearchResultDto>> searchPlantCategory(
+        @RequestParam String keyword) {
         return ResponseEntity.ok(plantCategoryService.searchPlantCategory(keyword));
     }
 }

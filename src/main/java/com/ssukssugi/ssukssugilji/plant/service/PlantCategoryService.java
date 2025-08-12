@@ -1,7 +1,7 @@
 package com.ssukssugi.ssukssugilji.plant.service;
 
 import com.ssukssugi.ssukssugilji.plant.dao.PlantCategoryRepository;
-import com.ssukssugi.ssukssugilji.plant.entity.PlantCategory;
+import com.ssukssugi.ssukssugilji.plant.dto.PlantCategorySearchResultDto;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -13,10 +13,10 @@ public class PlantCategoryService {
 
     private final PlantCategoryRepository plantCategoryRepository;
 
-    public List<String> searchPlantCategory(String keyword) {
+    public List<PlantCategorySearchResultDto> searchPlantCategory(String keyword) {
         return plantCategoryRepository.findByNameLike(wrap(keyword))
             .stream()
-            .map(PlantCategory::getName)
+            .map(plantCategory -> PlantCategorySearchResultDto.from(plantCategory.getName()))
             .collect(Collectors.toList());
     }
 
