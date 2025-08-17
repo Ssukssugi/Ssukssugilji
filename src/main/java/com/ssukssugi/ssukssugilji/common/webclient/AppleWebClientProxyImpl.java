@@ -113,11 +113,11 @@ public class AppleWebClientProxyImpl implements WebClientProxy {
                 "&grant_type=authorization_code")
             .retrieve()
             .onStatus(HttpStatusCode::is4xxClientError, error -> {
-                log.error("Apple API 4xx Error: {}", error.statusCode());
+                log.error("Apple API {} Error: {}", error.statusCode(), error);
                 return error.createException();
             })
             .onStatus(HttpStatusCode::is5xxServerError, error -> {
-                log.error("Apple API 5xx Error: {}", error.statusCode());
+                log.error("Apple API {} Error: {}", error.statusCode(), error);
                 return error.createException();
             })
             .toEntity(Map.class)
