@@ -7,12 +7,15 @@ import io.netty.channel.ChannelOption;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
 import jakarta.annotation.PostConstruct;
+import jakarta.security.auth.message.AuthException;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.time.Duration;
 import java.util.Date;
 import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,8 +26,12 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 
 @Component
@@ -56,10 +63,10 @@ public class AppleWebClientProxyImpl implements WebClientProxy {
     private void init() throws Exception {
         HttpClient httpClient = HttpClient.create()
             .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
-            .responseTimeout(Duration.ofMillis(5000))
+            .responseTimeout(Duration.ofSeconds(5))
             .doOnConnected(conn ->
-                conn.addHandlerLast(new ReadTimeoutHandler(5000))
-                    .addHandlerLast(new WriteTimeoutHandler(5000)));
+                conn.addHandlerLast(new ReadTimeoutHandler(5, TimeUnit.SECONDS))
+                    .addHandlerLast(new WriteTimeoutHandler(5, TimeUnit.SECONDS)));
 
         webClient = WebClient.builder()
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON.toString())
@@ -103,19 +110,24 @@ public class AppleWebClientProxyImpl implements WebClientProxy {
 
     @Override
     public AppleUserInfoResponse getUserInfo(String accessToken) {
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("client_id", APPLE_CLIENT_ID);
+        params.add("client_secret", APPLE_CLIENT_SECRET);
+        params.add("code", accessToken);
+        params.add("grant_type", "authorization_code");
+
         ResponseEntity<Map> response = webClient
             .post()
             .uri(GET_USERINFO_API_URL)
-            .header(HttpHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded")
-            .bodyValue("client_id=" + APPLE_CLIENT_ID +
-                "&client_secret=" + APPLE_CLIENT_SECRET +
-                "&code=" + accessToken +
-                "&grant_type=authorization_code")
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .bodyValue(params)
             .retrieve()
-            .onStatus(HttpStatusCode::is4xxClientError, error -> {
-                log.error("Apple API {} Error: {}", error.statusCode(), error);
-                return error.createException();
-            })
+            .onStatus(HttpStatusCode::is4xxClientError, error -> error.bodyToMono(String.class)
+                .flatMap(errorBody -> {
+                    log.error("Apple API {} Error: {}, Body: {}",
+                        error.statusCode(), error, errorBody);
+                    return Mono.error(new AuthException("Apple Auth Failed: " + errorBody));
+                }))
             .onStatus(HttpStatusCode::is5xxServerError, error -> {
                 log.error("Apple API {} Error: {}", error.statusCode(), error);
                 return error.createException();
@@ -138,12 +150,28 @@ public class AppleWebClientProxyImpl implements WebClientProxy {
     }
 
     private AppleUserInfoResponse parseMap(Map<String, Object> map) {
-        AppleUserInfoResponse response = new AppleUserInfoResponse();
-        response.setAccessToken((String) map.get("access_token"));
-        response.setTokenType((String) map.get("token_type"));
-        response.setExpiresIn((Integer) map.get("expires_in"));
-        response.setRefreshToken((String) map.get("refresh_token"));
-        response.setIdToken((String) map.get("id_token"));
-        return response;
+        try {
+            return AppleUserInfoResponse.builder()
+                .accessToken(Objects.toString(map.get("access_token"), null))
+                .tokenType(Objects.toString(map.get("token_type"), null))
+                .expiresIn(map.get("expires_in") instanceof Integer ?
+                    (Integer) map.get("expires_in") : null)
+                .refreshToken(Objects.toString(map.get("refresh_token"), null))
+                .idToken(Objects.toString(map.get("id_token"), null))
+                .build();
+        } catch (Exception e) {
+            log.error("Failed to parse Apple response: {}", map, e);
+            throw new RuntimeException("Invalid response format from Apple");
+        }
+    }
+
+    @Scheduled(fixedRate = 24 * 60 * 60 * 1000) // Daily
+    private void refreshClientSecretDaily() {
+        try {
+            APPLE_CLIENT_SECRET = generateClientSecret();
+            log.info("Apple client secret refreshed successfully");
+        } catch (Exception e) {
+            log.error("Failed to refresh Apple client secret", e);
+        }
     }
 }
