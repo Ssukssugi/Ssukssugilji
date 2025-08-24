@@ -13,4 +13,8 @@ public class DiaryUpdateRequest {
     private List<CareType> careTypes;
     private String diary;
     private Boolean updateImage;
+
+    public void setDiary(String diary) {
+        this.diary = diary.replace("\n", "\\n");
+    }
 }

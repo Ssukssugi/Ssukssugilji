@@ -14,4 +14,8 @@ public class DiaryCreateRequest {
     private LocalDate date;
     private List<CareType> careTypes;
     private String diary;
+
+    public void setDiary(String diary) {
+        this.diary = diary.replace("\n", "\\n");
+    }
 }
