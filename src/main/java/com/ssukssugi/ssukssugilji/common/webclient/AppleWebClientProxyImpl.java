@@ -109,11 +109,11 @@ public class AppleWebClientProxyImpl implements WebClientProxy {
     }
 
     @Override
-    public AppleUserInfoResponse getUserInfo(String accessToken) {
+    public AppleUserInfoResponse getUserInfo(String authorizationCode) {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("client_id", APPLE_CLIENT_ID);
         params.add("client_secret", APPLE_CLIENT_SECRET);
-        params.add("code", accessToken);
+        params.add("code", authorizationCode);
         params.add("grant_type", "authorization_code");
 
         ResponseEntity<Map> response = webClient
@@ -133,6 +133,7 @@ public class AppleWebClientProxyImpl implements WebClientProxy {
                 return error.createException();
             })
             .toEntity(Map.class)
+            .timeout(Duration.ofSeconds(3))
             .block();
 
         if (response == null) {

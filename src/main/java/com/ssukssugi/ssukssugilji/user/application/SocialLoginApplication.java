@@ -27,20 +27,31 @@ public class SocialLoginApplication {
 
     public SocialLoginResponse socialLogin(
         SocialLoginRequest request, HttpServletResponse response) {
-        Optional<User> user = findUserIdByAuthInfo(
-            request.getLoginType(), request.getAccessToken());
-        boolean isRegistered = user.isPresent();
-        boolean existInfo = false;
-        if (isRegistered) {
-            Long userId = user.get().getUserId();
-            setTokenHeader(response, userId);
-            existInfo = userService.checkIfUserInfoExist(userId);
-            log.info("success to social-login, userId: {}, existInfo: {}", userId, existInfo);
+        SocialAuthUserInfoDto authUserInfo = socialAuthContext
+            .getAuthUserInfo(request.getLoginType(), request.getAccessToken());
+        Optional<User> user = userService.getUserOptByAuthInfo(authUserInfo);
+
+        if (user.isPresent()) {
+            return respondForExistingUser(response, user.get());
         }
 
         return SocialLoginResponse
             .builder()
-            .isRegistered(isRegistered)
+            .isRegistered(false)
+            .existInfo(false)
+            .socialId(authUserInfo.getSocialId())
+            .emailAddress(authUserInfo.getEmailAddress())
+            .build();
+    }
+
+    private SocialLoginResponse respondForExistingUser(HttpServletResponse response, User user) {
+        Long userId = user.getUserId();
+        setTokenHeader(response, userId);
+        boolean existInfo = userService.checkIfUserInfoExist(userId);
+        log.info("success to social-login, userId: {}, existInfo: {}", userId, existInfo);
+        return SocialLoginResponse
+            .builder()
+            .isRegistered(true)
             .existInfo(existInfo)
             .build();
     }
@@ -48,15 +59,12 @@ public class SocialLoginApplication {
     private Optional<User> findUserIdByAuthInfo(LoginType loginType, String accessToken) {
         SocialAuthUserInfoDto socialAuthUserInfoDto = socialAuthContext
             .getAuthUserInfo(loginType, accessToken);
-        return userService.getUserIdByAuthInfo(socialAuthUserInfoDto);
+        return userService.getUserOptByAuthInfo(socialAuthUserInfoDto);
     }
 
     @Transactional
     public void signUp(SignUpRequest request, HttpServletResponse response) {
-        SocialAuthUserInfoDto socialAuthUserInfoDto = socialAuthContext
-            .getAuthUserInfo(request.getLoginType(), request.getAccessToken());
-        Long userId = userService.signUp(socialAuthUserInfoDto, request.getTermsAgreement())
-            .getUserId();
+        Long userId = userService.signUp(request).getUserId();
         log.info("Success to sign-up, userId: {}, loginType: {}", userId, request.getLoginType());
         setTokenHeader(response, userId);
     }

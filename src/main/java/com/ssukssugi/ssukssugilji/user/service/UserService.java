@@ -2,8 +2,8 @@ package com.ssukssugi.ssukssugilji.user.service;
 
 import com.ssukssugi.ssukssugilji.auth.service.SecurityUtil;
 import com.ssukssugi.ssukssugilji.user.dao.UserRepository;
+import com.ssukssugi.ssukssugilji.user.dto.SignUpRequest;
 import com.ssukssugi.ssukssugilji.user.dto.SocialAuthUserInfoDto;
-import com.ssukssugi.ssukssugilji.user.dto.TermsAgreement;
 import com.ssukssugi.ssukssugilji.user.dto.UserDetailDto;
 import com.ssukssugi.ssukssugilji.user.dto.profile.UserProfileDto;
 import com.ssukssugi.ssukssugilji.user.dto.profile.UserProfileUpdateRequest;
@@ -24,24 +24,23 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserDetailService userDetailService;
 
-    public Optional<User> getUserIdByAuthInfo(SocialAuthUserInfoDto socialAuthUserInfoDto) {
+    public Optional<User> getUserOptByAuthInfo(SocialAuthUserInfoDto socialAuthUserInfoDto) {
         return userRepository.findBySocialIdAndLoginType(
             socialAuthUserInfoDto.getSocialId(), socialAuthUserInfoDto.getLoginType());
     }
 
     @Transactional
-    public User signUp(
-        SocialAuthUserInfoDto socialAuthUserInfoDto, TermsAgreement termsAgreement) {
-        User user = createUser(socialAuthUserInfoDto);
-        user.setAgreeToReceiveMarketing(termsAgreement.isMarketing());
+    public User signUp(SignUpRequest request) {
+        User user = createUser(request);
+        user.setAgreeToReceiveMarketing(request.getTermsAgreement().isMarketing());
         return userRepository.save(user);
     }
 
-    private User createUser(SocialAuthUserInfoDto socialAuthUserInfoDto) {
+    private User createUser(SignUpRequest request) {
         return User.builder()
-            .loginType(socialAuthUserInfoDto.getLoginType())
-            .emailAddress(socialAuthUserInfoDto.getEmailAddress())
-            .socialId(socialAuthUserInfoDto.getSocialId())
+            .loginType(request.getLoginType())
+            .socialId(request.getSocialId())
+            .emailAddress(request.getEmailAddress())
             .receiveServiceNoti(true)
             .build();
     }

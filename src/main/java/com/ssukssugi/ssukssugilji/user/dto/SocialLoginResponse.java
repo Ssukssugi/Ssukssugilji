@@ -13,4 +13,6 @@ public class SocialLoginResponse {
 
     private Boolean isRegistered;
     private Boolean existInfo;
+    private String socialId;
+    private String emailAddress;
 }

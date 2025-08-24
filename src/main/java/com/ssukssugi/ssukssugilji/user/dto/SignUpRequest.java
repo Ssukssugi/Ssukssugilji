@@ -13,8 +13,10 @@ import lombok.NoArgsConstructor;
 public class SignUpRequest {
 
     @NotNull
-    private String accessToken;
-    @NotNull
     private LoginType loginType;
+    @NotNull
+    private String socialId;
+    @NotNull
+    private String emailAddress;
     private TermsAgreement termsAgreement;
 }
