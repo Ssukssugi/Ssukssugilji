@@ -5,6 +5,7 @@ import io.netty.channel.ChannelOption;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
 import jakarta.annotation.PostConstruct;
+import jakarta.security.auth.message.AuthException;
 import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 
 @Component
@@ -40,7 +42,7 @@ public class GoogleWebClientProxyImpl implements WebClientProxy {
 
         webClient = WebClient.builder()
             .baseUrl("https://identitytoolkit.googleapis.com")
-            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON.toString())
+            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .clientConnector(new ReactorClientHttpConnector(httpClient))
             .build();
     }
@@ -54,12 +56,14 @@ public class GoogleWebClientProxyImpl implements WebClientProxy {
                 .build())
             .bodyValue("{\"idToken\": \"" + accessToken + "\"}")
             .retrieve()
-            .onStatus(HttpStatusCode::is4xxClientError, error -> {
-                log.error("Google API 4xx Error: {}", error.statusCode());
-                return error.createException();
-            })
+            .onStatus(HttpStatusCode::is4xxClientError, error -> error.bodyToMono(String.class)
+                .flatMap(errorBody -> {
+                    log.error("Google API {} Error: {}, Body: {}",
+                        error.statusCode(), error, errorBody);
+                    return Mono.error(new AuthException("Google Auth Failed: " + errorBody));
+                }))
             .onStatus(HttpStatusCode::is5xxServerError, error -> {
-                log.error("Google API 5xx Error: {}", error.statusCode());
+                log.error("Google API {} Error: {}", error.statusCode(), error);
                 return error.createException();
             })
             .toEntity(GoogleUserInfoResponse.class)
