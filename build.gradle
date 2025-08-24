@@ -65,6 +65,9 @@ dependencies {
     // R2
     implementation 'software.amazon.awssdk:s3:2.26.21'
     // issue: https://community.cloudflare.com/t/the-request-signature-we-calculated-does-not-match-the-signature-you-provided/773465
+
+    // Google API
+    implementation 'com.google.api-client:google-api-client:2.2.0'
 }
 
 tasks.named('test') {

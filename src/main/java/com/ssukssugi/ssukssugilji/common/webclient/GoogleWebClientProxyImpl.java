@@ -1,5 +1,9 @@
 package com.ssukssugi.ssukssugilji.common.webclient;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
 import com.ssukssugi.ssukssugilji.user.dto.google.GoogleUserInfoResponse;
 import io.netty.channel.ChannelOption;
 import io.netty.handler.timeout.ReadTimeoutHandler;
@@ -7,6 +11,9 @@ import io.netty.handler.timeout.WriteTimeoutHandler;
 import jakarta.annotation.PostConstruct;
 import jakarta.security.auth.message.AuthException;
 import java.time.Duration;
+import java.util.Collections;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -24,6 +31,8 @@ import reactor.netty.http.client.HttpClient;
 public class GoogleWebClientProxyImpl implements WebClientProxy {
 
     private WebClient webClient;
+
+    private static final String CLIENT_ID = "341233184627-s07ukai2jbjbm6khdbnfgip5e793la72.apps.googleusercontent.com";
 
     @Value("${google.api.key}")
     private String GOOGLE_API_KEY;
@@ -47,14 +56,43 @@ public class GoogleWebClientProxyImpl implements WebClientProxy {
             .build();
     }
 
+    public GoogleIdToken.Payload verifyToken(String idTokenString) {
+        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(
+            new NetHttpTransport(),
+            new GsonFactory()
+        )
+            .setAudience(Collections.singletonList(CLIENT_ID)) // 내 앱의 client_id 검증
+            .build();
+
+        try {
+            GoogleIdToken idToken = verifier.verify(idTokenString);
+            if (idToken != null) {
+                return idToken.getPayload(); // 유효 → 클레임 추출 가능
+            } else {
+                throw new RuntimeException("idToken is null");
+            }
+        } catch (Exception e) {
+            log.error("Google ID Token verification failed: {}", e.getMessage());
+            throw new RuntimeException("Invalid ID Token ", e);
+        }
+    }
+
+    @Data
+    @AllArgsConstructor
+    private static class GoogleAuthRequest {
+
+        private String idToken;
+    }
+
     @Override
     public GoogleUserInfoResponse getUserInfo(String accessToken) {
+        verifyToken(accessToken);
         ResponseEntity<GoogleUserInfoResponse> response = webClient
             .post()
             .uri(uriBuilder -> uriBuilder.path("/v1/accounts:lookup")
                 .queryParam("key", GOOGLE_API_KEY)
                 .build())
-            .bodyValue("{\"idToken\": \"" + accessToken + "\"}")
+            .bodyValue(new GoogleAuthRequest(accessToken))
             .retrieve()
             .onStatus(HttpStatusCode::is4xxClientError, error -> error.bodyToMono(String.class)
                 .flatMap(errorBody -> {
