@@ -39,6 +39,7 @@ public class GoogleWebClientProxyImpl implements WebClientProxy {
                     .addHandlerLast(new WriteTimeoutHandler(5000)));
 
         webClient = WebClient.builder()
+            .baseUrl("https://identitytoolkit.googleapis.com")
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON.toString())
             .clientConnector(new ReactorClientHttpConnector(httpClient))
             .build();
@@ -48,7 +49,7 @@ public class GoogleWebClientProxyImpl implements WebClientProxy {
     public GoogleUserInfoResponse getUserInfo(String accessToken) {
         ResponseEntity<GoogleUserInfoResponse> response = webClient
             .post()
-            .uri(uriBuilder -> uriBuilder.path(GET_USERINFO_API_URL)
+            .uri(uriBuilder -> uriBuilder.path("/v1/accounts:lookup")
                 .queryParam("key", GOOGLE_API_KEY)
                 .build())
             .bodyValue("{\"idToken\": \"" + accessToken + "\"}")
