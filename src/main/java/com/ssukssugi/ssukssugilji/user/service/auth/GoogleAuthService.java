@@ -9,19 +9,19 @@ import com.ssukssugi.ssukssugilji.user.dto.LoginType;
 import com.ssukssugi.ssukssugilji.user.dto.SocialAuthUserInfoDto;
 import com.ssukssugi.ssukssugilji.user.dto.google.GoogleUserInfoResponse;
 import java.util.Collections;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@Getter
 public class GoogleAuthService implements SocialAuthService {
-    
+
     private static final LoginType LOGIN_TYPE = LoginType.GOOGLE;
-    private static final String CLIENT_ID = "341233184627-s07ukai2jbjbm6khdbnfgip5e793la72.apps.googleusercontent.com";
+    @Value("${google.client-id}")
+    private String CLIENT_ID;
 
     @Override
     public LoginType getLoginType() {
@@ -50,24 +50,19 @@ public class GoogleAuthService implements SocialAuthService {
             .build();
     }
 
-    public GoogleIdToken.Payload verifyToken(String idTokenString) {
+    private GoogleIdToken.Payload verifyToken(String idToken) {
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(
             new NetHttpTransport(),
             new GsonFactory()
         )
-            .setAudience(Collections.singletonList(CLIENT_ID)) // 내 앱의 client_id 검증
+            .setAudience(Collections.singletonList(CLIENT_ID))
             .build();
 
         try {
-            GoogleIdToken idToken = verifier.verify(idTokenString);
-            if (idToken != null) {
-                return idToken.getPayload(); // 유효 → 클레임 추출 가능
-            } else {
-                throw new RuntimeException("idToken is null");
-            }
+            GoogleIdToken googleIdToken = verifier.verify(idToken);
+            return googleIdToken.getPayload();
         } catch (Exception e) {
-            log.error("Google ID Token verification failed: {}", e.getMessage());
-            throw new RuntimeException("Invalid ID Token ", e);
+            throw new RuntimeException("Google ID Token verification failed ", e);
         }
     }
 
