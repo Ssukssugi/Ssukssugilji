@@ -101,14 +101,12 @@ public class JwtService {
         boolean isRefreshValid =
             jwtUtil.getTokenStatus(token, REFRESH_SECRET_KEY) == JwtTokenStatus.AUTHENTICATED;
 
-        log.info("isRefreshValid: {}, userId: {}", isRefreshValid, userId);
-
         Token storedToken = tokenRepository.findByUserId(userId).orElseThrow(
             () -> new IllegalArgumentException("Token not found by userId: " + userId));
         boolean isTokenMatched = storedToken.getRefreshToken().equals(token);
 
-        log.info("storedToken: {}, providedToken: {}", storedToken.getRefreshToken(), token);
-        log.info("isTokenMatched: {}, userId: {}", isTokenMatched, userId);
+        log.info("isRefreshValid: {}, isTokenMatched: {}, userId: {}",
+            isRefreshValid, isTokenMatched, userId);
 
         return isRefreshValid && isTokenMatched;
     }
