@@ -60,12 +60,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
+        log.info("Access Token is invalid. Try to validate Refresh Token");
+
         String refreshToken = jwtService.resolveTokenFromCookie(request, JwtRule.REFRESH_PREFIX);
         Long userId = jwtService.getUserIdFromRefreshToken(refreshToken);
+
+        log.info("refreshToken: {}, userId: {}", refreshToken, userId);
 
         if (jwtService.validateRefreshToken(refreshToken, userId)) {
             String reissuedAccessToken = jwtService.issueAndSetAccessToken(response, userId);
             jwtService.issueAndSetRefreshToken(response, userId);
+
+            log.info("Reissue Access Token: {}", reissuedAccessToken);
+            log.info("Cookies: {}", response.getHeaders("Set-Cookie"));
 
             setAuthenticationToContext(reissuedAccessToken);
             filterChain.doFilter(request, response);

@@ -1,7 +1,6 @@
 package com.ssukssugi.ssukssugilji.user.application;
 
 import com.ssukssugi.ssukssugilji.auth.service.JwtService;
-import com.ssukssugi.ssukssugilji.user.dto.LoginType;
 import com.ssukssugi.ssukssugilji.user.dto.SignUpRequest;
 import com.ssukssugi.ssukssugilji.user.dto.SocialAuthUserInfoDto;
 import com.ssukssugi.ssukssugilji.user.dto.SocialLoginRequest;
@@ -54,12 +53,6 @@ public class SocialLoginApplication {
             .isRegistered(true)
             .existInfo(existInfo)
             .build();
-    }
-
-    private Optional<User> findUserIdByAuthInfo(LoginType loginType, String accessToken) {
-        SocialAuthUserInfoDto socialAuthUserInfoDto = socialAuthContext
-            .getAuthUserInfo(loginType, accessToken);
-        return userService.getUserOptByAuthInfo(socialAuthUserInfoDto);
     }
 
     @Transactional

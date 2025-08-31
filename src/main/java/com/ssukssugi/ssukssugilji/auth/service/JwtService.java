@@ -1,7 +1,6 @@
 package com.ssukssugi.ssukssugilji.auth.service;
 
 import static com.ssukssugi.ssukssugilji.auth.jwt.JwtRule.ACCESS_PREFIX;
-import static com.ssukssugi.ssukssugilji.auth.jwt.JwtRule.JWT_ISSUE_HEADER;
 import static com.ssukssugi.ssukssugilji.auth.jwt.JwtRule.REFRESH_PREFIX;
 
 import com.ssukssugi.ssukssugilji.auth.dao.TokenRepository;
@@ -20,7 +19,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.security.Key;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -61,9 +59,12 @@ public class JwtService {
     public String issueAndSetAccessToken(HttpServletResponse response, Long requestUserId) {
         String accessToken = jwtGenerator.generateAccessToken(ACCESS_SECRET_KEY, ACCESS_EXPIRATION,
             requestUserId);
-        ResponseCookie cookie = setTokenToCookie(ACCESS_PREFIX.getValue(), accessToken,
-            ACCESS_EXPIRATION / 1000);
-        response.addHeader(JWT_ISSUE_HEADER.getValue(), cookie.toString());
+        Cookie cookie = new Cookie(ACCESS_PREFIX.getValue(), accessToken);
+        cookie.setPath("/");
+        cookie.setMaxAge((int) (ACCESS_EXPIRATION / 1000));
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        response.addCookie(cookie);
 
         return accessToken;
     }
@@ -72,9 +73,12 @@ public class JwtService {
     public void issueAndSetRefreshToken(HttpServletResponse response, Long requestUserId) {
         String refreshToken = jwtGenerator.generateRefreshToken(REFRESH_SECRET_KEY,
             REFRESH_EXPIRATION, requestUserId);
-        ResponseCookie cookie = setTokenToCookie(REFRESH_PREFIX.getValue(), refreshToken,
-            REFRESH_EXPIRATION / 1000);
-        response.addHeader(JWT_ISSUE_HEADER.getValue(), cookie.toString());
+        Cookie cookie = new Cookie(REFRESH_PREFIX.getValue(), refreshToken);
+        cookie.setPath("/");
+        cookie.setMaxAge((int) (REFRESH_EXPIRATION / 1000));
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        response.addCookie(cookie);
 
         upsertTokenDB(requestUserId, refreshToken);
     }
@@ -89,16 +93,6 @@ public class JwtService {
         tokenRepository.save(entity);
     }
 
-    private ResponseCookie setTokenToCookie(String tokenPrefix, String token, long maxAgeSeconds) {
-        return ResponseCookie.from(tokenPrefix, token)
-            .path("/")
-            .maxAge(maxAgeSeconds)
-            .httpOnly(true)
-            .sameSite("None")
-            .secure(true)
-            .build();
-    }
-
     public boolean validateAccessToken(String token) {
         return jwtUtil.getTokenStatus(token, ACCESS_SECRET_KEY) == JwtTokenStatus.AUTHENTICATED;
     }
@@ -107,9 +101,14 @@ public class JwtService {
         boolean isRefreshValid =
             jwtUtil.getTokenStatus(token, REFRESH_SECRET_KEY) == JwtTokenStatus.AUTHENTICATED;
 
+        log.info("isRefreshValid: {}, userId: {}", isRefreshValid, userId);
+
         Token storedToken = tokenRepository.findByUserId(userId).orElseThrow(
             () -> new IllegalArgumentException("Token not found by userId: " + userId));
         boolean isTokenMatched = storedToken.getRefreshToken().equals(token);
+
+        log.info("storedToken: {}, providedToken: {}", storedToken.getRefreshToken(), token);
+        log.info("isTokenMatched: {}, userId: {}", isTokenMatched, userId);
 
         return isRefreshValid && isTokenMatched;
     }

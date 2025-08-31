@@ -1,11 +1,14 @@
 package com.ssukssugi.ssukssugilji.user.dto.google;
 
 import com.ssukssugi.ssukssugilji.user.dto.SocialUserInfoResponse;
-import java.util.List;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
+@Builder
 public class GoogleUserInfoResponse extends SocialUserInfoResponse {
 
-    private List<GoogleUserInfo> users;
+    private String localId;
+    private String email;
+    private Boolean emailVerified;
 }
