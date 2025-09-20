@@ -26,7 +26,6 @@ public class SocialAuthContext {
     }
 
     public SocialAuthUserInfoDto getAuthUserInfo(LoginType loginType, String accessToken) {
-        log.info("Fetching user info for login type: {}, accessToken: {}", loginType, accessToken);
         SocialAuthService socialAuthService = socialAuthServiceMap.get(loginType);
         if (socialAuthService == null) {
             throw new IllegalArgumentException("Invalid login type");
