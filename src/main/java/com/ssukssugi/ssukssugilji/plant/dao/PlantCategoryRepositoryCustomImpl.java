@@ -9,7 +9,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class PlantCategoryRepositoryImpl implements PlantCategoryRepositoryCustom {
+public class PlantCategoryRepositoryCustomImpl implements PlantCategoryRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 

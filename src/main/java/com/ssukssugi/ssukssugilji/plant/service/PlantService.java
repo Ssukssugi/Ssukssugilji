@@ -1,7 +1,6 @@
 package com.ssukssugi.ssukssugilji.plant.service;
 
 import com.ssukssugi.ssukssugilji.auth.service.SecurityUtil;
-import com.ssukssugi.ssukssugilji.common.BaseEntity;
 import com.ssukssugi.ssukssugilji.common.R2Util;
 import com.ssukssugi.ssukssugilji.plant.dao.PlantRepository;
 import com.ssukssugi.ssukssugilji.plant.dto.DiaryByMonthListDto;
@@ -13,10 +12,8 @@ import com.ssukssugi.ssukssugilji.plant.dto.UserPlantUpsertRequest;
 import com.ssukssugi.ssukssugilji.plant.entity.Diary;
 import com.ssukssugi.ssukssugilji.plant.entity.Plant;
 import com.ssukssugi.ssukssugilji.user.entity.User;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,18 +27,7 @@ public class PlantService {
     private final DiaryService diaryService;
 
     public List<UserPlantDto> getUserPlantList(User user) {
-        return plantRepository.findByUser(user)
-            .stream()
-            .sorted(Comparator.comparing(BaseEntity::getCreatedAt).reversed())
-            .map(plant -> {
-                // TODO: resolve N+1 issue!
-                String image = diaryService.getMostRecent(plant).map(Diary::getImageUrl)
-                    .map(R2Util::toR2Url).orElse(null);
-                UserPlantDto userPlantDto = UserPlantDto.fromEntity(plant);
-                userPlantDto.setImage(image);
-                return userPlantDto;
-            })
-            .collect(Collectors.toList());
+        return plantRepository.findPlantWithDiariesByUserId(user.getUserId());
     }
 
     public UserPlantDto getUserPlantInfo(Long plantId) {
