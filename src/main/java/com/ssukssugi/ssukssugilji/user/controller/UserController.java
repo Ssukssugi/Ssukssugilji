@@ -1,7 +1,7 @@
 package com.ssukssugi.ssukssugilji.user.controller;
 
 import com.ssukssugi.ssukssugilji.auth.service.JwtService;
-import com.ssukssugi.ssukssugilji.auth.service.SecurityUtil;
+import com.ssukssugi.ssukssugilji.common.UserContext;
 import com.ssukssugi.ssukssugilji.user.dto.DupNicknameCheckRequest;
 import com.ssukssugi.ssukssugilji.user.dto.DupNicknameCheckResponse;
 import com.ssukssugi.ssukssugilji.user.dto.UserDetailDto;
@@ -40,8 +40,8 @@ public class UserController {
 
     @DeleteMapping
     public ResponseEntity<Boolean> withdraw(HttpServletResponse response) {
-        userService.withdraw(SecurityUtil.getUser());
-        jwtService.logout(SecurityUtil.getUser().getUserId(), response);
+        userService.withdraw(UserContext.getUser());
+        jwtService.logout(UserContext.getUser().getUserId(), response);
         return ResponseEntity.ok(true);
     }
 }

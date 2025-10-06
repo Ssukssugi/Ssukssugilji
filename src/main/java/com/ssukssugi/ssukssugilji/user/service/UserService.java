@@ -1,6 +1,6 @@
 package com.ssukssugi.ssukssugilji.user.service;
 
-import com.ssukssugi.ssukssugilji.auth.service.SecurityUtil;
+import com.ssukssugi.ssukssugilji.common.UserContext;
 import com.ssukssugi.ssukssugilji.user.dao.UserRepository;
 import com.ssukssugi.ssukssugilji.user.dto.SignUpRequest;
 import com.ssukssugi.ssukssugilji.user.dto.SocialAuthUserInfoDto;
@@ -52,7 +52,7 @@ public class UserService {
     }
 
     public void saveUserDetail(UserDetailDto dto) {
-        User user = SecurityUtil.getUser();
+        User user = UserContext.getUser();
         if (userDetailService.findOptionalByUser(user).isPresent()) {
             throw new IllegalArgumentException("UserDetail is already exist");
         }
@@ -74,22 +74,22 @@ public class UserService {
 
     public UserProfileDto getUserProfile() {
         UserProfileDto userProfileDto = new UserProfileDto();
-        userProfileDto.setNickname(SecurityUtil.getUser().getUserDetail().getNickname());
+        userProfileDto.setNickname(UserContext.getUser().getUserDetail().getNickname());
         return userProfileDto;
     }
 
     public void updateUserProfile(UserProfileUpdateRequest request) {
-        User user = SecurityUtil.getUser();
+        User user = UserContext.getUser();
         user.setNickname(request.getNickname());
         userRepository.save(user);
     }
 
     public UserSettingDto getUserSettings() {
-        return UserSettingDto.fromEntity(SecurityUtil.getUser());
+        return UserSettingDto.fromEntity(UserContext.getUser());
     }
 
     public void setUserToggle(UserToggleSetRequest request) {
-        User user = SecurityUtil.getUser();
+        User user = UserContext.getUser();
         switch (request.getKey()) {
             case MARKETING -> user.setAgreeToReceiveMarketing(request.getValue());
             case SERVICE_NOTI -> user.setReceiveServiceNoti(request.getValue());

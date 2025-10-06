@@ -1,6 +1,6 @@
 package com.ssukssugi.ssukssugilji.plant.controller;
 
-import com.ssukssugi.ssukssugilji.auth.service.SecurityUtil;
+import com.ssukssugi.ssukssugilji.common.UserContext;
 import com.ssukssugi.ssukssugilji.plant.dto.PlantProfileDto;
 import com.ssukssugi.ssukssugilji.plant.dto.UserPlantDto;
 import com.ssukssugi.ssukssugilji.plant.dto.UserPlantListDto;
@@ -29,7 +29,7 @@ public class PlantController {
     @GetMapping
     public ResponseEntity<UserPlantListDto> getUserPlantList() {
         UserPlantListDto response = new UserPlantListDto();
-        response.setPlants(plantService.getUserPlantList(SecurityUtil.getUser()));
+        response.setPlants(plantService.getUserPlantList(UserContext.getUser()));
         return ResponseEntity.ok(response);
     }
 

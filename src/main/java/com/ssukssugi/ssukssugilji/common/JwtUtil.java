@@ -1,5 +1,7 @@
-package com.ssukssugi.ssukssugilji.auth.jwt;
+package com.ssukssugi.ssukssugilji.common;
 
+import com.ssukssugi.ssukssugilji.auth.jwt.JwtRule;
+import com.ssukssugi.ssukssugilji.auth.jwt.JwtTokenStatus;
 import com.ssukssugi.ssukssugilji.common.error.exception.InvalidRequestException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -29,7 +31,7 @@ public class JwtUtil {
                 .parseClaimsJws(token);
             return JwtTokenStatus.AUTHENTICATED;
         } catch (ExpiredJwtException | IllegalArgumentException e) {
-//            log.error(INVALID_EXPIRED_JWT.getMessage());
+            log.error("Expired JWT: ", e);
             return JwtTokenStatus.EXPIRED;
         } catch (JwtException e) {
             throw new InvalidRequestException("Invalid JWT token");

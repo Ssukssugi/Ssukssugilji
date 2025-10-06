@@ -1,7 +1,7 @@
 package com.ssukssugi.ssukssugilji.plant.service;
 
-import com.ssukssugi.ssukssugilji.auth.service.SecurityUtil;
 import com.ssukssugi.ssukssugilji.common.R2Util;
+import com.ssukssugi.ssukssugilji.common.UserContext;
 import com.ssukssugi.ssukssugilji.plant.dao.PlantRepository;
 import com.ssukssugi.ssukssugilji.plant.dto.DiaryByMonthListDto;
 import com.ssukssugi.ssukssugilji.plant.dto.DiaryCreateRequest;
@@ -47,7 +47,7 @@ public class PlantService {
             .plantCategory(request.getPlantCategory())
             .shine(request.getPlantEnvironment().getShine())
             .place(request.getPlantEnvironment().getPlace())
-            .user(SecurityUtil.getUser())
+            .user(UserContext.getUser())
             .build());
     }
 

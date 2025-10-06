@@ -8,7 +8,7 @@ import com.ssukssugi.ssukssugilji.auth.entity.Token;
 import com.ssukssugi.ssukssugilji.auth.jwt.JwtGenerator;
 import com.ssukssugi.ssukssugilji.auth.jwt.JwtRule;
 import com.ssukssugi.ssukssugilji.auth.jwt.JwtTokenStatus;
-import com.ssukssugi.ssukssugilji.auth.jwt.JwtUtil;
+import com.ssukssugi.ssukssugilji.common.JwtUtil;
 import com.ssukssugi.ssukssugilji.common.error.exception.InvalidRequestException;
 import com.ssukssugi.ssukssugilji.user.entity.User;
 import com.ssukssugi.ssukssugilji.user.service.UserService;
