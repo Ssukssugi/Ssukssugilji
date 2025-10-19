@@ -93,7 +93,7 @@ public class DiaryService {
             + plantId + "_"
             + date.format(DateTimeFormatter.ISO_LOCAL_DATE) + "_"
             + UUID.randomUUID()
-            + ".jpeg";
+            + ".webp";
     }
 
     public Optional<Diary> getMostRecent(Plant plant) {

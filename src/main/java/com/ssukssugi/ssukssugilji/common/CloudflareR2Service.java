@@ -2,8 +2,17 @@ package com.ssukssugi.ssukssugilji.common;
 
 import com.ssukssugi.ssukssugilji.common.error.exception.InvalidRequestException;
 import jakarta.annotation.PostConstruct;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
+import javax.imageio.IIOImage;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.stream.ImageOutputStream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,14 +56,44 @@ public class CloudflareR2Service {
 
     public String uploadFile(String fileName, MultipartFile file) throws IOException {
         validateFileName(fileName);
-        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-            .bucket(bucketName)
-            .key(fileName.substring(1))
-            .contentType(file.getContentType())
-            .build();
+//        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+//            .bucket(bucketName)
+//            .key(fileName.substring(1))
+//            .contentType(file.getContentType())
+//            .build();
+//
+//        PutObjectResponse response = s3Client.putObject(putObjectRequest,
+//            RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
 
-        PutObjectResponse response = s3Client.putObject(putObjectRequest,
-            RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
+        // 1. JPEG, PNG 등 어떤 포맷이든 BufferedImage로 읽음
+        BufferedImage image = ImageIO.read(file.getInputStream());
+
+        // 2. WebP로 인코딩
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageWriter writer = ImageIO.getImageWritersByMIMEType("image/webp").next();
+        ImageOutputStream ios = ImageIO.createImageOutputStream(baos);
+        writer.setOutput(ios);
+
+        ImageWriteParam writeParam = writer.getDefaultWriteParam();
+        writeParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+        writeParam.setCompressionQuality(0.9f);
+
+        writer.write(null, new IIOImage(image, null, null), writeParam);
+        ios.close();
+        writer.dispose();
+
+        // 3. ByteArrayInputStream으로 변환해서 S3 업로드
+        byte[] webpBytes = baos.toByteArray();
+        InputStream webpInputStream = new ByteArrayInputStream(webpBytes);
+
+        PutObjectResponse response = s3Client.putObject(
+            PutObjectRequest.builder()
+                .bucket(bucketName)
+                .key(fileName.substring(1))
+                .contentType("image/webp")
+                .build(),
+            RequestBody.fromInputStream(webpInputStream, webpBytes.length)
+        );
 
         if (response.sdkHttpResponse().isSuccessful()) {
             return fileName;
@@ -69,6 +108,11 @@ public class CloudflareR2Service {
         if (!fileName.startsWith("/")) {
             throw new InvalidRequestException(
                 "File name must start with a slash. Provided: " + fileName);
+        }
+
+        if (!fileName.endsWith(".webp")) {
+            throw new InvalidRequestException(
+                "File name must end with .webp extension. Provided: " + fileName);
         }
     }
 }

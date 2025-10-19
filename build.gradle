@@ -68,6 +68,9 @@ dependencies {
 
     // Google API
     implementation 'com.google.api-client:google-api-client:2.2.0'
+
+    // webp
+    implementation 'com.twelvemonkeys.imageio:imageio-webp:3.10.1'
 }
 
 tasks.named('test') {
