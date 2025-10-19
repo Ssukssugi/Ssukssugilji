@@ -26,8 +26,26 @@ public class PlantService {
     private final PlantRepository plantRepository;
     private final DiaryService diaryService;
 
-    public List<UserPlantDto> getUserPlantList(User user) {
-        return plantRepository.findPlantWithDiariesByUserId(user.getUserId());
+    public List<UserPlantDto> getUserPlantList(User user, boolean addDiaryCount) {
+        List<UserPlantDto> plantDtoList = plantRepository.findPlantWithDiariesByUserId(
+            user.getUserId());
+        attachDiaryCount(addDiaryCount, plantDtoList);
+        return plantDtoList;
+    }
+
+    private void attachDiaryCount(boolean addDiaryCount, List<UserPlantDto> plantDtoList) {
+        if (!addDiaryCount) {
+            return;
+        }
+        List<Long> plantIds = plantDtoList.stream().map(UserPlantDto::getPlantId).toList();
+
+        // TODO: move responsibility to diaryService
+        plantRepository.getDiaryCounts(plantIds).forEach((plantId, count) -> {
+            plantDtoList.stream()
+                .filter(dto -> dto.getPlantId().equals(plantId))
+                .findFirst()
+                .ifPresent(plantDto -> plantDto.setDiaryCount(count));
+        });
     }
 
     public UserPlantDto getUserPlantInfo(Long plantId) {

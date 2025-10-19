@@ -27,9 +27,10 @@ public class PlantController {
     private final PlantService plantService;
 
     @GetMapping
-    public ResponseEntity<UserPlantListDto> getUserPlantList() {
+    public ResponseEntity<UserPlantListDto> getUserPlantList(
+        @RequestParam(required = false, defaultValue = "false") Boolean diaryCount) {
         UserPlantListDto response = new UserPlantListDto();
-        response.setPlants(plantService.getUserPlantList(UserContext.getUser()));
+        response.setPlants(plantService.getUserPlantList(UserContext.getUser(), diaryCount));
         return ResponseEntity.ok(response);
     }
 

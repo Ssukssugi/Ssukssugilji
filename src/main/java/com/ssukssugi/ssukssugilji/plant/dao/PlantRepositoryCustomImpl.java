@@ -1,37 +1,46 @@
 package com.ssukssugi.ssukssugilji.plant.dao;
 
-import static com.ssukssugi.ssukssugilji.plant.entity.QDiary.diary1;
-import static com.ssukssugi.ssukssugilji.plant.entity.QPlant.plant;
-
+import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.ssukssugi.ssukssugilji.common.R2Util;
 import com.ssukssugi.ssukssugilji.plant.dto.UserPlantDto;
+import com.ssukssugi.ssukssugilji.plant.entity.QDiary;
+import com.ssukssugi.ssukssugilji.plant.entity.QPlant;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class PlantRepositoryCustomImpl implements PlantRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
+    private final QPlant plant = QPlant.plant;
+    private final QDiary diary = QDiary.diary1;
 
     @Override
     public List<UserPlantDto> findPlantWithDiariesByUserId(Long userId) {
+        QDiary subDiary = new QDiary("subDiary");
+
         List<UserPlantDto> results = queryFactory
             .select(Projections.fields(UserPlantDto.class,
                 plant.plantId,
                 plant.name,
                 plant.plantCategory,
-                diary1.imageUrl.as("image")
+                diary.imageUrl.as("image"),
+                ExpressionUtils.as(Expressions.constant(0L), "diaryCount")
             ))
             .from(plant)
-            .leftJoin(diary1).on(diary1.plant.eq(plant)
-                .and(diary1.createdAt.eq(
+            .leftJoin(diary).on(diary.plant.eq(plant)
+                .and(diary.createdAt.eq(
                     JPAExpressions
-                        .select(diary1.createdAt.max())
-                        .from(diary1)
-                        .where(diary1.plant.eq(plant))
+                        .select(subDiary.createdAt.max())
+                        .from(subDiary)
+                        .where(subDiary.plant.eq(plant))
                 )))
             .where(plant.user.userId.eq(userId))
             .orderBy(plant.createdAt.desc())
@@ -44,5 +53,24 @@ public class PlantRepositoryCustomImpl implements PlantRepositoryCustom {
         });
 
         return results;
+    }
+
+    @Override
+    public Map<Long, Long> getDiaryCounts(List<Long> plantIds) {
+        if (plantIds == null || plantIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        return queryFactory
+            .select(diary.plant.plantId, diary.count())
+            .from(diary)
+            .where(diary.plant.plantId.in(plantIds))
+            .groupBy(diary.plant.plantId)
+            .fetch()
+            .stream()
+            .collect(Collectors.toMap(
+                t -> t.get(diary.plant.plantId),
+                t -> t.get(diary.count())
+            ));
     }
 }
