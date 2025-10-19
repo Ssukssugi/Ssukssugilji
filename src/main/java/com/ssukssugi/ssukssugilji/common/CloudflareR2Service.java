@@ -56,51 +56,64 @@ public class CloudflareR2Service {
 
     public String uploadFile(String fileName, MultipartFile file) throws IOException {
         validateFileName(fileName);
-//        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-//            .bucket(bucketName)
-//            .key(fileName.substring(1))
-//            .contentType(file.getContentType())
-//            .build();
-//
-//        PutObjectResponse response = s3Client.putObject(putObjectRequest,
-//            RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
-
-        // 1. JPEG, PNG 등 어떤 포맷이든 BufferedImage로 읽음
         BufferedImage image = ImageIO.read(file.getInputStream());
+        float quality = calculateQuality(file, image);
+        byte[] webpBytes = convertToWebPBytes(image, quality);
+        return uploadToR2(fileName, webpBytes);
+    }
 
-        // 2. WebP로 인코딩
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageWriter writer = ImageIO.getImageWritersByMIMEType("image/webp").next();
-        ImageOutputStream ios = ImageIO.createImageOutputStream(baos);
-        writer.setOutput(ios);
-
-        ImageWriteParam writeParam = writer.getDefaultWriteParam();
-        writeParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-        writeParam.setCompressionQuality(0.9f);
-
-        writer.write(null, new IIOImage(image, null, null), writeParam);
-        ios.close();
-        writer.dispose();
-
-        // 3. ByteArrayInputStream으로 변환해서 S3 업로드
-        byte[] webpBytes = baos.toByteArray();
-        InputStream webpInputStream = new ByteArrayInputStream(webpBytes);
-
-        PutObjectResponse response = s3Client.putObject(
-            PutObjectRequest.builder()
-                .bucket(bucketName)
-                .key(fileName.substring(1))
-                .contentType("image/webp")
-                .build(),
-            RequestBody.fromInputStream(webpInputStream, webpBytes.length)
-        );
-
-        if (response.sdkHttpResponse().isSuccessful()) {
-            return fileName;
+    private float calculateQuality(MultipartFile file, BufferedImage image) {
+        long fileSizeMB = file.getSize() / (1024 * 1024);
+        float quality;
+        if (fileSizeMB > 10) {
+            quality = 0.75f;
+        } else if (fileSizeMB > 3) {
+            quality = 0.85f;
         } else {
-            throw new RuntimeException(
-                "File upload failed: " + response.sdkHttpResponse().statusText()
-                    .orElse("Unknown error"));
+            quality = 0.9f;
+        }
+        if (image.getWidth() > 3000 || image.getHeight() > 3000) {
+            quality = Math.min(quality, 0.8f);
+        }
+        return quality;
+    }
+
+    private byte[] convertToWebPBytes(BufferedImage image, float quality) throws IOException {
+        ImageWriter writer = ImageIO.getImageWritersByMIMEType("image/webp").next();
+        try {
+            ImageWriteParam writeParam = writer.getDefaultWriteParam();
+            writeParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+            writeParam.setCompressionQuality(quality);
+            try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ImageOutputStream ios = ImageIO.createImageOutputStream(baos)) {
+                writer.setOutput(ios);
+                writer.write(null, new IIOImage(image, null, null), writeParam);
+                ios.flush();
+                return baos.toByteArray();
+            }
+        } finally {
+            writer.dispose();
+        }
+    }
+
+    private String uploadToR2(String fileName, byte[] webpBytes) throws IOException {
+        try (InputStream webpInputStream = new ByteArrayInputStream(webpBytes)) {
+            PutObjectResponse response = s3Client.putObject(
+                PutObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(fileName.substring(1))
+                    .contentType("image/webp")
+                    .build(),
+                RequestBody.fromInputStream(webpInputStream, webpBytes.length)
+            );
+            if (response.sdkHttpResponse().isSuccessful()) {
+                return fileName;
+            } else {
+                throw new InvalidRequestException(
+                    "Cloudflare R2 upload failed: " +
+                        response.sdkHttpResponse().statusText().orElse("Unknown error")
+                );
+            }
         }
     }
 
