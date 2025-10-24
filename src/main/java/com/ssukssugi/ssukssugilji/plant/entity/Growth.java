@@ -35,11 +35,11 @@ public class Growth extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
-    @JoinColumn(name = "diaryId")
+    @JoinColumn(name = "beforeDiaryId")
     @OneToOne(fetch = FetchType.EAGER)
     private Diary beforeDiary;
 
-    @JoinColumn(name = "diaryId")
+    @JoinColumn(name = "afterDiaryId")
     @OneToOne(fetch = FetchType.EAGER)
     private Diary afterDiary;
 }
