@@ -73,9 +73,9 @@ public class UserService {
     }
 
     public UserProfileDto getUserProfile() {
-        UserProfileDto userProfileDto = new UserProfileDto();
-        userProfileDto.setNickname(UserContext.getUser().getUserDetail().getNickname());
-        return userProfileDto;
+        return UserProfileDto.builder()
+            .nickname(UserContext.getUser().getNickname())
+            .build();
     }
 
     public void updateUserProfile(UserProfileUpdateRequest request) {
