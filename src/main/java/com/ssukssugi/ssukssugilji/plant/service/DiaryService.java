@@ -28,12 +28,19 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 public class DiaryService {
 
+    private static final String PLANT_DIARY_DIR = "/plant_diary/";
     private final DiaryRepository diaryRepository;
     private final CloudflareR2Service cloudflareR2Service;
 
-    private static final String PLANT_DIARY_DIR = "/plant_diary/";
+    private static String buildImageUrl(Long plantId, LocalDate date) {
+        return PLANT_DIARY_DIR
+            + plantId + "_"
+            + date.format(DateTimeFormatter.ISO_LOCAL_DATE) + "_"
+            + UUID.randomUUID()
+            + ".webp";
+    }
 
-    private Diary getById(Long diaryId) {
+    public Diary getById(Long diaryId) {
         return diaryRepository.findById(diaryId)
             .orElseThrow(
                 () -> new IllegalArgumentException("Diary not found, diaryId = " + diaryId));
@@ -86,14 +93,6 @@ public class DiaryService {
                     e);
             }
         }
-    }
-
-    private static String buildImageUrl(Long plantId, LocalDate date) {
-        return PLANT_DIARY_DIR
-            + plantId + "_"
-            + date.format(DateTimeFormatter.ISO_LOCAL_DATE) + "_"
-            + UUID.randomUUID()
-            + ".webp";
     }
 
     public Optional<Diary> getMostRecent(Plant plant) {
