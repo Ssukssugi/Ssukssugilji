@@ -4,8 +4,10 @@ import com.ssukssugi.ssukssugilji.plant.dao.GrowthRepository;
 import com.ssukssugi.ssukssugilji.plant.dto.GrowthIntroduceRequest;
 import com.ssukssugi.ssukssugilji.plant.dto.GrowthVo;
 import com.ssukssugi.ssukssugilji.plant.dto.GrowthVoListDto;
+import com.ssukssugi.ssukssugilji.plant.dto.SimpleDiaryVo;
 import com.ssukssugi.ssukssugilji.plant.entity.Diary;
 import com.ssukssugi.ssukssugilji.plant.entity.Growth;
+import com.ssukssugi.ssukssugilji.user.dto.profile.UserProfileDto;
 import com.ssukssugi.ssukssugilji.user.entity.User;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
@@ -16,11 +18,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class GrowthService {
 
     private static final Integer PAGE_SIZE = 5;
     private final GrowthRepository growthRepository;
     private final DiaryService diaryService;
+    private final PlantService plantService;
 
     private Growth findById(Long growthId) {
         return growthRepository.findById(growthId)
@@ -33,13 +37,25 @@ public class GrowthService {
         return GrowthVoListDto.builder()
             .growths(growthRepository.findByUser(user)
                 .stream()
-                .map(GrowthVo::from)
+                .map(this::convertToGrowthVo)
                 .toList()
             )
             .build();
     }
 
-    @Transactional
+    public GrowthVo convertToGrowthVo(Growth growth) {
+        return GrowthVo.builder()
+            .growthId(growth.getGrowthId())
+            .owner(UserProfileDto
+                .builder()
+                .userId(growth.getUser().getUserId())
+                .build())
+            .plant(plantService.getPlantProfile(growth.getBeforeDiary().getPlant().getPlantId()))
+            .before(SimpleDiaryVo.from(growth.getBeforeDiary()))
+            .after(SimpleDiaryVo.from(growth.getAfterDiary()))
+            .build();
+    }
+
     public void createGrowth(User user, GrowthIntroduceRequest request) {
         Diary before = diaryService.getById(request.beforeDiaryId());
         Diary after = diaryService.getById(request.afterDiaryId());
@@ -59,6 +75,7 @@ public class GrowthService {
         growthRepository.deleteById(growthId);
     }
 
+    @Transactional(readOnly = true)
     public Page<Growth> getGrowthListPage(Long cursorGrowthId) {
         if (cursorGrowthId == 0L) {
             return growthRepository.findByCreatedAtBeforeOrderByCreatedAtDesc(

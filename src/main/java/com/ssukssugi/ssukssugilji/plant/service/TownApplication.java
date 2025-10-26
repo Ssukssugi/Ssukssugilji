@@ -1,6 +1,5 @@
 package com.ssukssugi.ssukssugilji.plant.service;
 
-import com.ssukssugi.ssukssugilji.plant.dto.GrowthVo;
 import com.ssukssugi.ssukssugilji.plant.dto.GrowthVoListDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -17,7 +16,7 @@ public class TownApplication {
                 growthService.getGrowthListPage(cursorGrowthId)
                     .getContent()
                     .stream()
-                    .map(GrowthVo::from)
+                    .map(growthService::convertToGrowthVo)
                     .toList()
             )
             .build();
