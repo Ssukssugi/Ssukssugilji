@@ -7,7 +7,10 @@ import com.ssukssugi.ssukssugilji.plant.dto.GrowthVoListDto;
 import com.ssukssugi.ssukssugilji.plant.entity.Diary;
 import com.ssukssugi.ssukssugilji.plant.entity.Growth;
 import com.ssukssugi.ssukssugilji.user.entity.User;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,8 +18,15 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class GrowthService {
 
+    private static final Integer PAGE_SIZE = 5;
     private final GrowthRepository growthRepository;
     private final DiaryService diaryService;
+
+    private Growth findById(Long growthId) {
+        return growthRepository.findById(growthId)
+            .orElseThrow(
+                () -> new IllegalArgumentException("Growth not found with id: " + growthId));
+    }
 
     @Transactional(readOnly = true)
     public GrowthVoListDto getGrowthListByUser(User user) {
@@ -47,5 +57,17 @@ public class GrowthService {
 
     public void deleteGrowth(Long growthId) {
         growthRepository.deleteById(growthId);
+    }
+
+    public Page<Growth> getGrowthListPage(Long cursorGrowthId) {
+        if (cursorGrowthId == 0L) {
+            return growthRepository.findByCreatedAtBeforeOrderByCreatedAtDesc(
+                LocalDateTime.now(),
+                PageRequest.of(0, PAGE_SIZE));
+        }
+
+        LocalDateTime cursorCreatedAt = findById(cursorGrowthId).getCreatedAt();
+        return growthRepository.findByCreatedAtBeforeOrderByCreatedAtDesc(
+            cursorCreatedAt, PageRequest.of(0, PAGE_SIZE));
     }
 }
