@@ -37,7 +37,7 @@ public class DiaryService {
             + plantId + "_"
             + date.format(DateTimeFormatter.ISO_LOCAL_DATE) + "_"
             + UUID.randomUUID()
-            + ".webp";
+            + ".jpeg";
     }
 
     public Diary getById(Long diaryId) {
