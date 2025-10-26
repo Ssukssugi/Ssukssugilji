@@ -124,7 +124,9 @@ public class DiaryService {
                     .month(entry.getKey().getSecond().shortValue())
                     .diaries(DiaryDto.fromEntities(
                         entry.getValue().stream()
-                            .sorted(Comparator.comparing(Diary::getDate).reversed())
+                            .sorted(Comparator.comparing(Diary::getDate).reversed()
+                                .thenComparing(Comparator.comparing(Diary::getCreatedAt).reversed())
+                            )
                             .collect(Collectors.toList())))
                     .build())
                 .collect(Collectors.toList())
