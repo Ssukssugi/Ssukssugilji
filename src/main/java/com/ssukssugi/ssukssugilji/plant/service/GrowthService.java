@@ -26,7 +26,7 @@ public class GrowthService {
     private final DiaryService diaryService;
     private final PlantService plantService;
 
-    private Growth findById(Long growthId) {
+    public Growth findById(Long growthId) {
         return growthRepository.findById(growthId)
             .orElseThrow(
                 () -> new IllegalArgumentException("Growth not found with id: " + growthId));
