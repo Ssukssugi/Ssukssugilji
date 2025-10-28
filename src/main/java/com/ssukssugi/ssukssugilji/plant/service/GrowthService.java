@@ -65,6 +65,7 @@ public class GrowthService {
 
         growthRepository.save(
             Growth.builder()
+                .user(user)
                 .beforeDiary(before)
                 .afterDiary(after)
                 .build()
