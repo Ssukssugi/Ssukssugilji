@@ -8,9 +8,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.Builder;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 @Data
 @Builder
+@Slf4j
 public class DiaryDto {
 
     private Long diaryId;
@@ -20,6 +22,7 @@ public class DiaryDto {
     private List<CareType> cares;
 
     private static DiaryDto fromEntity(Diary entity) {
+        log.info("[DEBUG] fromEntity - diary content: {}", entity.getDiary());
         return DiaryDto.builder()
             .diaryId(entity.getDiaryId())
             .date(entity.getDate())

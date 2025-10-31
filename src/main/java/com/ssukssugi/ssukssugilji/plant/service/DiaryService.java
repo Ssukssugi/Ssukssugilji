@@ -49,6 +49,7 @@ public class DiaryService {
     @Transactional
     public Diary createDiary(DiaryCreateRequest request, Plant plant, MultipartFile image) {
         String imageUrl = buildImageUrl(request.getPlantId(), request.getDate());
+        log.info("[DEBUG] createDiary - diary content: {}", request.getDiary());
 
         Diary diary = Diary.builder()
             .date(request.getDate())
@@ -74,6 +75,7 @@ public class DiaryService {
     public void updateDiary(
         Plant plant, Long diaryId, DiaryUpdateRequest request, MultipartFile image) {
         Diary diary = getById(diaryId);
+        log.info("[DEBUG] updateDiary - diary content: {}", request.getDiary());
 
         diary.setDate(request.getDate());
         diary.setCareTypes(request.getCareTypes());
