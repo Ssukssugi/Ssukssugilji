@@ -45,6 +45,7 @@ public class User extends BaseEntity {
     private Boolean agreeToReceiveMarketing;
 
     @Column
+    @Builder.Default
     private Boolean receiveServiceNoti = true;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)

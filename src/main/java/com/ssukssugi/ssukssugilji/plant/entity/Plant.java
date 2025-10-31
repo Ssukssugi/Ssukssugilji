@@ -55,6 +55,7 @@ public class Plant extends BaseEntity {
     private Place place;
 
     @OneToMany(mappedBy = "plant", cascade = CascadeType.ALL)
+    @Builder.Default
     private List<Diary> diaries = new ArrayList<>();
 
     public void addDiary(Diary diary) {

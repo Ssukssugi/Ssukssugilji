@@ -30,11 +30,10 @@ public class JwtUtil {
                 .build()
                 .parseClaimsJws(token);
             return JwtTokenStatus.AUTHENTICATED;
-        } catch (ExpiredJwtException | IllegalArgumentException e) {
-            log.error("Expired JWT: ", e);
+        } catch (ExpiredJwtException e) {
             return JwtTokenStatus.EXPIRED;
-        } catch (JwtException e) {
-            throw new InvalidRequestException("Invalid JWT token");
+        } catch (JwtException | IllegalArgumentException e) {
+            return JwtTokenStatus.INVALID;
         }
     }
 
@@ -43,7 +42,9 @@ public class JwtUtil {
             .filter(cookie -> cookie.getName().equals(tokenPrefix.getValue()))
             .findFirst()
             .map(Cookie::getValue)
-            .orElse("");
+            .orElseThrow(
+                () -> new InvalidRequestException(
+                    tokenPrefix.getValue() + " Token not found in cookies"));
     }
 
     public Key getSigningKey(String secretKey) {
