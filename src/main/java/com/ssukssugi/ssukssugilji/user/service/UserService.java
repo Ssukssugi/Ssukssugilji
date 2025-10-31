@@ -73,8 +73,10 @@ public class UserService {
     }
 
     public UserProfileDto getUserProfile() {
+        User user = UserContext.getUser();
         return UserProfileDto.builder()
-            .nickname(UserContext.getUser().getUserDetail().getNickname())
+            .userId(user.getUserId())
+            .nickname(user.getUserDetail().getNickname())
             .build();
     }
 
