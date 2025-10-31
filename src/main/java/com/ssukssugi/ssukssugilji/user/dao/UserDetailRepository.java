@@ -8,4 +8,6 @@ import org.springframework.data.repository.CrudRepository;
 public interface UserDetailRepository extends CrudRepository<UserDetail, Long> {
 
     Optional<UserDetail> findByUser(User user);
+
+    Optional<UserDetail> findByNickname(String nickname);
 }

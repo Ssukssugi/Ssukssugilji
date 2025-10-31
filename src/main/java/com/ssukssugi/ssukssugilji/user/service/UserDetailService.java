@@ -44,4 +44,14 @@ public class UserDetailService {
             userDetailRepository.delete(findByUser(user));
         }
     }
+
+    public Boolean findByNickName(String nickname) {
+        return userDetailRepository.findByNickname(nickname).isPresent();
+    }
+
+    public void updateNickName(User user, String nickName) {
+        UserDetail userDetail = findByUser(user);
+        userDetail.setNickname(nickName);
+        userDetailRepository.save(userDetail);
+    }
 }

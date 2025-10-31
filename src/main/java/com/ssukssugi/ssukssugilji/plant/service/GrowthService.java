@@ -49,7 +49,7 @@ public class GrowthService {
             .owner(UserProfileDto
                 .builder()
                 .userId(growth.getUser().getUserId())
-                .nickname(growth.getUser().getNickname())
+                .nickname(growth.getUser().getUserDetail().getNickname())
                 .build())
             .plant(plantService.getPlantProfile(growth.getBeforeDiary().getPlant().getPlantId()))
             .before(SimpleDiaryVo.from(growth.getBeforeDiary()))

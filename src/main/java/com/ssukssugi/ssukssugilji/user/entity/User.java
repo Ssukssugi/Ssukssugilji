@@ -47,9 +47,6 @@ public class User extends BaseEntity {
     @Column
     private Boolean receiveServiceNoti = true;
 
-    @Column
-    private String nickname;
-
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private UserDetail userDetail;
 }

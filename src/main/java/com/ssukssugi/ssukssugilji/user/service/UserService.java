@@ -60,7 +60,7 @@ public class UserService {
     }
 
     public Boolean checkNicknameExist(String nickname) {
-        return userRepository.findByNickname(nickname).isPresent();
+        return userDetailService.findByNickName(nickname);
     }
 
     public Boolean checkIfUserInfoExist(Long userId) {
@@ -74,14 +74,13 @@ public class UserService {
 
     public UserProfileDto getUserProfile() {
         return UserProfileDto.builder()
-            .nickname(UserContext.getUser().getNickname())
+            .nickname(UserContext.getUser().getUserDetail().getNickname())
             .build();
     }
 
     public void updateUserProfile(UserProfileUpdateRequest request) {
         User user = UserContext.getUser();
-        user.setNickname(request.getNickname());
-        userRepository.save(user);
+        userDetailService.updateNickName(user, request.getNickname());
     }
 
     public UserSettingDto getUserSettings() {
