@@ -131,9 +131,7 @@ public class JwtService {
             .password("")
             .roles("USER")
             .build();
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user,
-            userId, userDetails.getAuthorities());
-        return auth;
+        return new UsernamePasswordAuthenticationToken(user, userId, userDetails.getAuthorities());
     }
 
     private Long getUserId(String token, Key secretKey) {

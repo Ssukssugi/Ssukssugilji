@@ -32,6 +32,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
         FilterChain filterChain) throws ServletException, IOException {
 
+        if (request.getRequestURI().equals("/favicon.ico")) {
+            response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+            return;
+        }
+
         if (isPermittedURI(request.getRequestURI())) {
             SecurityContextHolder.getContext().setAuthentication(null);
             filterChain.doFilter(request, response);
@@ -39,18 +44,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String authToken = request.getHeader("x-request-auth");
-        if (authToken != null) {
-            try {
-                Long userId = Long.valueOf(request.getHeader("x-user-id"));
-                if (Objects.equals(authToken, apiAuthToken)) {
-                    SecurityContextHolder.getContext().setAuthentication(
-                        jwtService.createUserAuthentication(userId));
-                    filterChain.doFilter(request, response);
-                    return;
-                }
-            } catch (Exception e) {
-                log.warn("Jwt Authentication by auth header failed ", e);
-            }
+        if (authToken != null && Objects.equals(authToken, apiAuthToken)) {
+            Long userId = Long.valueOf(request.getHeader("x-user-id"));
+            SecurityContextHolder.getContext()
+                .setAuthentication(jwtService.createUserAuthentication(userId));
+            filterChain.doFilter(request, response);
+            return;
         }
 
         String accessToken = jwtService.resolveTokenFromCookie(request, JwtRule.ACCESS_PREFIX);
