@@ -1,6 +1,8 @@
 package com.ssukssugi.ssukssugilji.plant.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.ssukssugi.ssukssugilji.common.R2Util;
+import com.ssukssugi.ssukssugilji.common.RawStringSerializer;
 import com.ssukssugi.ssukssugilji.plant.entity.CareType;
 import com.ssukssugi.ssukssugilji.plant.entity.Diary;
 import java.time.LocalDate;
@@ -18,6 +20,7 @@ public class DiaryDto {
     private Long diaryId;
     private LocalDate date;
     private String image;
+    @JsonSerialize(using = RawStringSerializer.class)
     private String content;
     private List<CareType> cares;
 
