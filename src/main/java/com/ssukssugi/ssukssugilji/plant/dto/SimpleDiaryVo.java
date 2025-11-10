@@ -1,5 +1,6 @@
 package com.ssukssugi.ssukssugilji.plant.dto;
 
+import com.ssukssugi.ssukssugilji.common.R2Util;
 import com.ssukssugi.ssukssugilji.plant.entity.Diary;
 import java.time.LocalDate;
 import lombok.Builder;
@@ -12,7 +13,7 @@ public record SimpleDiaryVo(
 
     public static SimpleDiaryVo from(Diary beforeDiary) {
         return SimpleDiaryVo.builder()
-            .imageUrl(beforeDiary.getImageUrl())
+            .imageUrl(R2Util.toR2Url(beforeDiary.getImageUrl()))
             .date(beforeDiary.getDate())
             .build();
     }
