@@ -9,10 +9,10 @@ import com.ssukssugi.ssukssugilji.plant.entity.Diary;
 import com.ssukssugi.ssukssugilji.plant.entity.Growth;
 import com.ssukssugi.ssukssugilji.user.dto.profile.UserProfileDto;
 import com.ssukssugi.ssukssugilji.user.entity.User;
-import java.time.LocalDateTime;
+import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -78,15 +78,7 @@ public class GrowthService {
     }
 
     @Transactional(readOnly = true)
-    public Page<Growth> getGrowthListPage(Long cursorGrowthId) {
-        if (cursorGrowthId == 0L) {
-            return growthRepository.findByCreatedAtBeforeOrderByCreatedAtDesc(
-                LocalDateTime.now(),
-                PageRequest.of(0, PAGE_SIZE));
-        }
-
-        LocalDateTime cursorCreatedAt = findById(cursorGrowthId).getCreatedAt();
-        return growthRepository.findByCreatedAtBeforeOrderByCreatedAtDesc(
-            cursorCreatedAt, PageRequest.of(0, PAGE_SIZE));
+    public Page<Growth> getGrowthListPage(@Nullable Long cursorGrowthId) {
+        return new PageImpl<>(growthRepository.findNextGrowthPage(cursorGrowthId, PAGE_SIZE));
     }
 }

@@ -4,6 +4,7 @@ import com.ssukssugi.ssukssugilji.common.UserContext;
 import com.ssukssugi.ssukssugilji.plant.dto.GrowthVoListDto;
 import com.ssukssugi.ssukssugilji.plant.entity.Growth;
 import com.ssukssugi.ssukssugilji.user.entity.User;
+import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -14,7 +15,7 @@ public class TownApplication {
     private final GrowthService growthService;
     private final GrowthReportService growthReportService;
 
-    public GrowthVoListDto getGrowthList(Long cursorGrowthId) {
+    public GrowthVoListDto getGrowthList(@Nullable Long cursorGrowthId) {
         return GrowthVoListDto.builder()
             .growths(
                 growthService.getGrowthListPage(cursorGrowthId)

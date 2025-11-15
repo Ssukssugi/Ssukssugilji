@@ -2,6 +2,7 @@ package com.ssukssugi.ssukssugilji.plant.controller;
 
 import com.ssukssugi.ssukssugilji.plant.dto.GrowthVoListDto;
 import com.ssukssugi.ssukssugilji.plant.service.TownApplication;
+import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,7 +20,7 @@ public class TownController {
 
     @GetMapping("/growth")
     public ResponseEntity<GrowthVoListDto> getGrowthList(
-        @RequestParam(required = false, defaultValue = "0") Long lastGrowthId) {
+        @RequestParam(required = false) @Nullable Long lastGrowthId) {
         return ResponseEntity.ok(townApplication.getGrowthList(lastGrowthId));
     }
 
