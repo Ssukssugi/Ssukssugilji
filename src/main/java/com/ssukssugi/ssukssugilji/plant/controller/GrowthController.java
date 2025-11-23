@@ -1,7 +1,7 @@
 package com.ssukssugi.ssukssugilji.plant.controller;
 
 import com.ssukssugi.ssukssugilji.common.UserContext;
-import com.ssukssugi.ssukssugilji.plant.dto.GrowthIntroduceRequest;
+import com.ssukssugi.ssukssugilji.plant.controller.dto.GrowthIntroduceRequest;
 import com.ssukssugi.ssukssugilji.plant.dto.GrowthVoListDto;
 import com.ssukssugi.ssukssugilji.plant.service.GrowthService;
 import jakarta.validation.Valid;

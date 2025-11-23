@@ -1,5 +1,6 @@
-package com.ssukssugi.ssukssugilji.plant.dto;
+package com.ssukssugi.ssukssugilji.plant.controller.dto;
 
+import com.ssukssugi.ssukssugilji.plant.dto.PlantEnvironment;
 import lombok.Data;
 
 @Data

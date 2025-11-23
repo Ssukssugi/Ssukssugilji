@@ -2,13 +2,13 @@ package com.ssukssugi.ssukssugilji.plant.service;
 
 import com.ssukssugi.ssukssugilji.common.R2Util;
 import com.ssukssugi.ssukssugilji.common.UserContext;
+import com.ssukssugi.ssukssugilji.plant.controller.dto.DiaryCreateRequest;
+import com.ssukssugi.ssukssugilji.plant.controller.dto.DiaryUpdateRequest;
+import com.ssukssugi.ssukssugilji.plant.controller.dto.UserPlantUpsertRequest;
 import com.ssukssugi.ssukssugilji.plant.dao.PlantRepository;
 import com.ssukssugi.ssukssugilji.plant.dto.DiaryByMonthListDto;
-import com.ssukssugi.ssukssugilji.plant.dto.DiaryCreateRequest;
-import com.ssukssugi.ssukssugilji.plant.dto.DiaryUpdateRequest;
 import com.ssukssugi.ssukssugilji.plant.dto.PlantProfileDto;
 import com.ssukssugi.ssukssugilji.plant.dto.UserPlantDto;
-import com.ssukssugi.ssukssugilji.plant.dto.UserPlantUpsertRequest;
 import com.ssukssugi.ssukssugilji.plant.entity.Diary;
 import com.ssukssugi.ssukssugilji.plant.entity.Plant;
 import com.ssukssugi.ssukssugilji.user.entity.User;
@@ -59,14 +59,15 @@ public class PlantService {
     }
 
     @Transactional
-    public void createPlant(UserPlantUpsertRequest request) {
-        plantRepository.save(Plant.builder()
+    public Long createPlant(UserPlantUpsertRequest request) {
+        Plant saved = plantRepository.save(Plant.builder()
             .name(request.getName())
             .plantCategory(request.getPlantCategory())
             .shine(request.getPlantEnvironment().getShine())
             .place(request.getPlantEnvironment().getPlace())
             .user(UserContext.getUser())
             .build());
+        return saved.getPlantId();
     }
 
     public PlantProfileDto getPlantProfile(Long plantId) {

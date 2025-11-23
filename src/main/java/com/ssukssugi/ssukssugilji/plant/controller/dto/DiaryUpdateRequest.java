@@ -1,19 +1,18 @@
-package com.ssukssugi.ssukssugilji.plant.dto;
+package com.ssukssugi.ssukssugilji.plant.controller.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ssukssugi.ssukssugilji.plant.entity.CareType;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.Data;
 
 @Data
-public class DiaryCreateRequest {
+public class DiaryUpdateRequest {
 
     private Long plantId;
-    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
     private List<CareType> careTypes;
     private String diary;
+    private Boolean updateImage;
 
     public void setDiary(String diary) {
         this.diary = diary.replace("\n", "\\n");

@@ -1,10 +1,11 @@
 package com.ssukssugi.ssukssugilji.plant.controller;
 
 import com.ssukssugi.ssukssugilji.common.UserContext;
+import com.ssukssugi.ssukssugilji.plant.controller.dto.PlantCreateResponse;
+import com.ssukssugi.ssukssugilji.plant.controller.dto.UserPlantUpsertRequest;
 import com.ssukssugi.ssukssugilji.plant.dto.PlantProfileDto;
 import com.ssukssugi.ssukssugilji.plant.dto.UserPlantDto;
 import com.ssukssugi.ssukssugilji.plant.dto.UserPlantListDto;
-import com.ssukssugi.ssukssugilji.plant.dto.UserPlantUpsertRequest;
 import com.ssukssugi.ssukssugilji.plant.service.PlantService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -40,10 +41,9 @@ public class PlantController {
     }
 
     @PostMapping
-    public ResponseEntity<Boolean> createUserPlant(
+    public ResponseEntity<PlantCreateResponse> createUserPlant(
         @Valid @RequestBody UserPlantUpsertRequest request) {
-        plantService.createPlant(request);
-        return ResponseEntity.ok(true);
+        return ResponseEntity.ok(new PlantCreateResponse(plantService.createPlant(request)));
     }
 
     @PutMapping
