@@ -90,7 +90,7 @@ public class AppleWebClientProxyImpl implements WebClientProxy {
     }
 
     private PrivateKey getPrivateKey() throws Exception {
-        Resource privateKeyFile = resourceLoader.getResource("file:" + PRIVATE_KEY_PATH);
+        Resource privateKeyFile = resourceLoader.getResource(PRIVATE_KEY_PATH);
 
         if (!privateKeyFile.exists()) {
             throw new FileNotFoundException("Private key file not found at: " + PRIVATE_KEY_PATH);
