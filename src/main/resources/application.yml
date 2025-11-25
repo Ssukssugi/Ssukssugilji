@@ -1,7 +1,4 @@
 spring:
-  config:
-    import:
-      - classpath:application-local.yml
   servlet:
     multipart:
       enabled: true
