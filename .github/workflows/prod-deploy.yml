@@ -39,6 +39,6 @@ jobs:
           username: ec2-user
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            LATEST_JAR=$(ls -t /home/ec2-user/app/build/libs/*.jar | head -n 1)
+            LATEST_JAR=$(ls -t /home/ec2-user/app/*.jar | head -n 1)
             sudo cp "$LATEST_JAR" /home/ec2-user/app/app.jar
             sudo systemctl restart myapp
