@@ -31,6 +31,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "build/libs/*.jar"
           target: "/home/ec2-user/app/"
+          strip_components: 2
 
       - name: Restart service
         uses: appleboy/ssh-action@v0.1.10
