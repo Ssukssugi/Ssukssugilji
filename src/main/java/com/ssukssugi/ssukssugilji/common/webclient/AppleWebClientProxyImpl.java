@@ -8,6 +8,7 @@ import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
 import jakarta.annotation.PostConstruct;
 import jakarta.security.auth.message.AuthException;
+import java.io.FileNotFoundException;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -39,25 +40,19 @@ import reactor.netty.http.client.HttpClient;
 @RequiredArgsConstructor
 public class AppleWebClientProxyImpl implements WebClientProxy {
 
-    private WebClient webClient;
-
-    @Value("${apple.client.id}")
-    private String APPLE_CLIENT_ID;
-
-    @Value("${apple.key.id}")
-    private String APPLE_KEY_ID;
-
-    @Value("${apple.team.id}")
-    private String APPLE_TEAM_ID;
-
-    @Value("${apple.private.key.file.path}")
-    private String PRIVATE_KEY_PATH;
-
-    private String APPLE_CLIENT_SECRET;
-    private final ResourceLoader resourceLoader;
-
     // https://developer.apple.com/documentation/signinwithapplerestapi/generate-and-validate-tokens
     private static final String GET_USERINFO_API_URL = "https://appleid.apple.com/auth/token";
+    private final ResourceLoader resourceLoader;
+    private WebClient webClient;
+    @Value("${apple.client.id}")
+    private String APPLE_CLIENT_ID;
+    @Value("${apple.key.id}")
+    private String APPLE_KEY_ID;
+    @Value("${apple.team.id}")
+    private String APPLE_TEAM_ID;
+    @Value("${apple.private.key.file.path}")
+    private String PRIVATE_KEY_PATH;
+    private String APPLE_CLIENT_SECRET;
 
     @PostConstruct
     private void init() throws Exception {
@@ -95,7 +90,12 @@ public class AppleWebClientProxyImpl implements WebClientProxy {
     }
 
     private PrivateKey getPrivateKey() throws Exception {
-        Resource privateKeyFile = resourceLoader.getResource(PRIVATE_KEY_PATH);
+        Resource privateKeyFile = resourceLoader.getResource("file:" + PRIVATE_KEY_PATH);
+
+        if (!privateKeyFile.exists()) {
+            throw new FileNotFoundException("Private key file not found at: " + PRIVATE_KEY_PATH);
+        }
+
         byte[] keyBytes = privateKeyFile.getInputStream().readAllBytes();
         String privateKeyPEM = new String(keyBytes)
             .replace("-----BEGIN PRIVATE KEY-----", "")
