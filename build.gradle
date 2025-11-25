@@ -8,6 +8,10 @@ bootJar {
     enabled = true
 }
 
+jar {
+    enabled = false
+}
+
 group = 'com.ssukssugi'
 version = '0.0.1-SNAPSHOT'
 
