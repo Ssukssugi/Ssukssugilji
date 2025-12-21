@@ -98,7 +98,7 @@ public class DiaryService {
     }
 
     public Optional<Diary> getMostRecent(Plant plant) {
-        return diaryRepository.findTopByPlantOrderByCreatedAtDesc(plant);
+        return diaryRepository.findTopByPlantOrderByDateDesc(plant);
     }
 
     public DiaryByMonthListDto getDiaryListByMonth(Plant plant) {

@@ -8,7 +8,7 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface DiaryRepository extends CrudRepository<Diary, Long> {
 
-    Optional<Diary> findTopByPlantOrderByCreatedAtDesc(Plant plant);
+    Optional<Diary> findTopByPlantOrderByDateDesc(Plant plant);
 
     List<Diary> findByPlant(Plant plant);
 }
