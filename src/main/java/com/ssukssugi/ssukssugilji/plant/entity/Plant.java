@@ -54,18 +54,12 @@ public class Plant extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Place place;
 
-    @OneToMany(mappedBy = "plant", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "plant", cascade = CascadeType.REMOVE)
     @Builder.Default
     private List<Diary> diaries = new ArrayList<>();
 
     public void addDiary(Diary diary) {
         diaries.add(diary);
         diary.setPlant(this);
-    }
-
-    public void moveDiary(Diary diary, Plant targetPlant) {
-        this.diaries.remove(diary);
-        targetPlant.diaries.add(diary);
-        diary.setPlant(targetPlant);
     }
 }

@@ -80,7 +80,9 @@ public class DiaryService {
         diary.setDate(request.getDate());
         diary.setCareTypes(request.getCareTypes());
         diary.setDiary(request.getDiary());
-        diary.getPlant().moveDiary(diary, plant);
+        if (!diary.getPlant().equals(plant)) {
+            diary.setPlant(plant);
+        }
 
         if (request.getUpdateImage()) {
             String imageUrl = buildImageUrl(diary.getPlant().getPlantId(), request.getDate());
