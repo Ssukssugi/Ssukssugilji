@@ -22,7 +22,6 @@ public class DiaryDto {
     private List<CareType> cares;
 
     private static DiaryDto fromEntity(Diary entity) {
-        log.info("[DEBUG] fromEntity - diary content: {}", entity.getDiary());
         return DiaryDto.builder()
             .diaryId(entity.getDiaryId())
             .date(entity.getDate())

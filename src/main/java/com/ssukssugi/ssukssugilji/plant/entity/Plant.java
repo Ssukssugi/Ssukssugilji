@@ -54,7 +54,7 @@ public class Plant extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Place place;
 
-    @OneToMany(mappedBy = "plant", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "plant", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Diary> diaries = new ArrayList<>();
 

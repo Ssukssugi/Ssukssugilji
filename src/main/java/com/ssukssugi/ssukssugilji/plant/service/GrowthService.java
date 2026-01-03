@@ -10,6 +10,7 @@ import com.ssukssugi.ssukssugilji.plant.entity.Growth;
 import com.ssukssugi.ssukssugilji.user.dto.profile.UserProfileDto;
 import com.ssukssugi.ssukssugilji.user.entity.User;
 import jakarta.annotation.Nullable;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -80,5 +81,9 @@ public class GrowthService {
     @Transactional(readOnly = true)
     public Page<Growth> getGrowthListPage(@Nullable Long cursorGrowthId) {
         return new PageImpl<>(growthRepository.findNextGrowthPage(cursorGrowthId, PAGE_SIZE));
+    }
+
+    public List<Growth> findRelatedGrowthsByDiaryId(Long diaryId) {
+        return growthRepository.findRelatedGrowthsByDiaryId(diaryId);
     }
 }

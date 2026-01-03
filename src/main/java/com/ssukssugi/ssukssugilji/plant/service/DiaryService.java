@@ -18,6 +18,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +32,7 @@ public class DiaryService {
     private static final String PLANT_DIARY_DIR = "/plant_diary/";
     private final DiaryRepository diaryRepository;
     private final CloudflareR2Service cloudflareR2Service;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     private static String buildImageUrl(Long plantId, LocalDate date) {
         return PLANT_DIARY_DIR
@@ -49,7 +51,6 @@ public class DiaryService {
     @Transactional
     public Diary createDiary(DiaryCreateRequest request, Plant plant, MultipartFile image) {
         String imageUrl = buildImageUrl(request.getPlantId(), request.getDate());
-        log.info("[DEBUG] createDiary - diary content: {}", request.getDiary());
 
         Diary diary = Diary.builder()
             .date(request.getDate())
@@ -75,7 +76,6 @@ public class DiaryService {
     public void updateDiary(
         Plant plant, Long diaryId, DiaryUpdateRequest request, MultipartFile image) {
         Diary diary = getById(diaryId);
-        log.info("[DEBUG] updateDiary - diary content: {}", request.getDiary());
 
         diary.setDate(request.getDate());
         diary.setCareTypes(request.getCareTypes());
@@ -98,7 +98,7 @@ public class DiaryService {
     }
 
     public Optional<Diary> getMostRecent(Plant plant) {
-        return diaryRepository.findTopByPlantOrderByDateDesc(plant);
+        return diaryRepository.findTopByPlantOrderByDateDescCreatedAtDesc(plant);
     }
 
     public DiaryByMonthListDto getDiaryListByMonth(Plant plant) {
@@ -136,6 +136,7 @@ public class DiaryService {
         return diaryByMonthListDto;
     }
 
+    @Transactional
     public void deleteDiary(Long diaryId) {
         diaryRepository.deleteById(diaryId);
     }

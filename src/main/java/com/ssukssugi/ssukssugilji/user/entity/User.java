@@ -48,6 +48,6 @@ public class User extends BaseEntity {
     @Builder.Default
     private Boolean receiveServiceNoti = true;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private UserDetail userDetail;
 }

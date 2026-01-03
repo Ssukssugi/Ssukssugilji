@@ -1,6 +1,7 @@
 package com.ssukssugi.ssukssugilji.user.service;
 
 import com.ssukssugi.ssukssugilji.common.UserContext;
+import com.ssukssugi.ssukssugilji.plant.deletion.PlantDeletionEvent;
 import com.ssukssugi.ssukssugilji.user.dao.UserRepository;
 import com.ssukssugi.ssukssugilji.user.dto.SignUpRequest;
 import com.ssukssugi.ssukssugilji.user.dto.SocialAuthUserInfoDto;
@@ -13,6 +14,7 @@ import com.ssukssugi.ssukssugilji.user.entity.User;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +25,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserDetailService userDetailService;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     public Optional<User> getUserOptByAuthInfo(SocialAuthUserInfoDto socialAuthUserInfoDto) {
         return userRepository.findBySocialIdAndLoginType(
@@ -70,6 +73,7 @@ public class UserService {
     public void withdraw(User user) {
         userRepository.delete(user);
         userDetailService.deleteByUserIfExist(user);
+        applicationEventPublisher.publishEvent(new PlantDeletionEvent(user));
     }
 
     public UserProfileDto getUserProfile() {

@@ -42,4 +42,13 @@ public class GrowthRepositoryCustomImpl implements GrowthRepositoryCustom {
             .limit(pageSize)
             .fetch();
     }
+
+    @Override
+    public List<Growth> findRelatedGrowthsByDiaryId(Long diaryId) {
+        return queryFactory
+            .selectFrom(growth)
+            .where(growth.beforeDiary.diaryId.eq(diaryId)
+                .or(growth.afterDiary.diaryId.eq(diaryId)))
+            .fetch();
+    }
 }
