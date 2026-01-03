@@ -63,8 +63,9 @@ public class Plant extends BaseEntity {
         diary.setPlant(this);
     }
 
-    public void deleteDiary(Diary diary) {
-        diaries.remove(diary);
-        diary.setPlant(null);
+    public void moveDiary(Diary diary, Plant targetPlant) {
+        this.diaries.remove(diary);
+        targetPlant.diaries.add(diary);
+        diary.setPlant(targetPlant);
     }
 }
