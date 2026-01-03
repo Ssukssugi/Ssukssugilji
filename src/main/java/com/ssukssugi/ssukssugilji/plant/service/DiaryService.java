@@ -18,7 +18,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +31,6 @@ public class DiaryService {
     private static final String PLANT_DIARY_DIR = "/plant_diary/";
     private final DiaryRepository diaryRepository;
     private final CloudflareR2Service cloudflareR2Service;
-    private final ApplicationEventPublisher applicationEventPublisher;
 
     private static String buildImageUrl(Long plantId, LocalDate date) {
         return PLANT_DIARY_DIR
