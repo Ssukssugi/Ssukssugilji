@@ -39,7 +39,6 @@ public class PlantService {
         }
         List<Long> plantIds = plantDtoList.stream().map(UserPlantDto::getPlantId).toList();
 
-        // TODO: move responsibility to diaryService
         plantRepository.getDiaryCounts(plantIds).forEach((plantId, count) -> {
             plantDtoList.stream()
                 .filter(dto -> dto.getPlantId().equals(plantId))
