@@ -42,9 +42,8 @@ public class JwtUtil {
             .filter(cookie -> cookie.getName().equals(tokenPrefix.getValue()))
             .findFirst()
             .map(Cookie::getValue)
-            .orElseThrow(
-                () -> new InvalidRequestException(
-                    tokenPrefix.getValue() + " Token not found in cookies"));
+            .orElseThrow(() -> new InvalidRequestException(
+                tokenPrefix.getValue() + " Token not found in cookies"));
     }
 
     public Key getSigningKey(String secretKey) {
