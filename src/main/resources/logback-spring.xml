@@ -1,0 +1,24 @@
+<configuration>
+
+  <!-- 콘솔 출력 -->
+  <appender class="ch.qos.logback.core.ConsoleAppender" name="CONSOLE">
+    <encoder>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <!-- Sentry 연동 -->
+  <appender class="io.sentry.logback.SentryAppender" name="SENTRY">
+    <!-- ERROR 이상만 Sentry 이벤트로 -->
+    <minimumBreadcrumbLevel>INFO</minimumBreadcrumbLevel>
+
+    <!-- INFO/WARN은 breadcrumb -->
+    <minimumEventLevel>ERROR</minimumEventLevel>
+  </appender>
+
+  <root level="INFO">
+    <appender-ref ref="CONSOLE"/>
+    <appender-ref ref="SENTRY"/>
+  </root>
+
+</configuration>

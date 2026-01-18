@@ -69,7 +69,8 @@ dependencies {
     implementation 'com.google.api-client:google-api-client:2.2.0'
 
     // Sentry
-    implementation("io.sentry:sentry-spring-boot-starter-jakarta:7.11.0")
+    implementation("io.sentry:sentry-spring-boot-starter-jakarta:8.15.1")
+    implementation("io.sentry:sentry-logback:8.15.1")
 }
 
 tasks.named('test') {
