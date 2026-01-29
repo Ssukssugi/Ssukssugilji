@@ -38,3 +38,11 @@ jobs:
           aws s3 cp "$JAR_PATH" "s3://${{ secrets.S3_BUCKET }}/releases/app-${{ github.sha }}.jar"
 
           aws s3 cp "$JAR_PATH" "s3://${{ secrets.S3_BUCKET }}/releases/app-latest.jar"
+
+      - name: Deploy via SSM Run Command
+        run: |
+          aws ssm send-command \
+            --document-name "AWS-RunShellScript" \
+            --targets "Key=instanceids,Values=${{ secrets.EC2_INSTANCE_ID }}" \
+            --parameters 'commands=["/opt/myapp/deploy.sh"]' \
+            --region ${{ secrets.AWS_REGION }}
