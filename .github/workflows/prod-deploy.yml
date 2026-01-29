@@ -23,23 +23,18 @@ jobs:
           chmod +x ./gradlew
           ./gradlew clean build -x test
 
-      - name: Copy JAR to EC2
-        uses: appleboy/scp-action@v0.1.7
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ec2-user
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "build/libs/*.jar"
-          target: "/home/ec2-user/app/"
-          strip_components: 2
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Restart service
-        uses: appleboy/ssh-action@v0.1.10
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ec2-user
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            LATEST_JAR=$(ls -t /home/ec2-user/app/*.jar | head -n 1)
-            sudo cp "$LATEST_JAR" /home/ec2-user/app/app.jar
-            sudo systemctl restart myapp
+      - name: Upload JAR to S3
+        run: |
+          JAR_PATH=$(ls -1 build/libs/*.jar | head -n 1)
+          echo "JAR_PATH=$JAR_PATH"
+
+          aws s3 cp "$JAR_PATH" "s3://${{ secrets.S3_BUCKET }}/releases/app-${{ github.sha }}.jar"
+
+          aws s3 cp "$JAR_PATH" "s3://${{ secrets.S3_BUCKET }}/releases/app-latest.jar"
