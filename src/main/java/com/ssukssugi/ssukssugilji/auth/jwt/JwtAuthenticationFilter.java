@@ -3,11 +3,10 @@ package com.ssukssugi.ssukssugilji.auth.jwt;
 import static com.ssukssugi.ssukssugilji.common.configuration.SecurityConfig.PERMITTED_URI;
 
 import com.ssukssugi.ssukssugilji.auth.service.JwtService;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -30,47 +29,56 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-        FilterChain filterChain) throws ServletException, IOException {
+        FilterChain filterChain) {
 
-        if (request.getRequestURI().equals("/favicon.ico")) {
-            response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-            return;
+        try {
+            if (request.getRequestURI().equals("/favicon.ico")) {
+                response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+                return;
+            }
+
+            if (isPermittedURI(request.getRequestURI())) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+
+            String authToken = request.getHeader("x-request-auth");
+            if (authToken != null && Objects.equals(authToken, apiAuthToken)) {
+                Long userId = Long.valueOf(request.getHeader("x-user-id"));
+                SecurityContextHolder.getContext()
+                    .setAuthentication(jwtService.createUserAuthentication(userId));
+                filterChain.doFilter(request, response);
+                return;
+            }
+
+            String accessToken = jwtService.resolveTokenFromCookie(request, JwtRule.ACCESS_PREFIX);
+            if (jwtService.validateAccessToken(accessToken)) {
+                setAuthenticationToContext(accessToken);
+                filterChain.doFilter(request, response);
+                return;
+            }
+
+            String refreshToken = jwtService.resolveTokenFromCookie(request,
+                JwtRule.REFRESH_PREFIX);
+            Long userId = jwtService.getUserIdFromRefreshToken(refreshToken);
+
+            if (jwtService.validateRefreshToken(refreshToken, userId)) {
+                String reissuedAccessToken = jwtService.issueAndSetAccessToken(response, userId);
+                jwtService.issueAndSetRefreshToken(response, userId);
+
+                setAuthenticationToContext(reissuedAccessToken);
+                filterChain.doFilter(request, response);
+                return;
+            }
+
+            jwtService.logout(userId, response);
+        } catch (JwtException e) {
+            log.warn("JWT validation failed: {}", e.getMessage());
+        } catch (Exception e) {
+            log.error("🔥 JWT Filter Exception - uri: {}", request.getRequestURI(), e);
+
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }
-
-        if (isPermittedURI(request.getRequestURI())) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        String authToken = request.getHeader("x-request-auth");
-        if (authToken != null && Objects.equals(authToken, apiAuthToken)) {
-            Long userId = Long.valueOf(request.getHeader("x-user-id"));
-            SecurityContextHolder.getContext()
-                .setAuthentication(jwtService.createUserAuthentication(userId));
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        String accessToken = jwtService.resolveTokenFromCookie(request, JwtRule.ACCESS_PREFIX);
-        if (jwtService.validateAccessToken(accessToken)) {
-            setAuthenticationToContext(accessToken);
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        String refreshToken = jwtService.resolveTokenFromCookie(request, JwtRule.REFRESH_PREFIX);
-        Long userId = jwtService.getUserIdFromRefreshToken(refreshToken);
-
-        if (jwtService.validateRefreshToken(refreshToken, userId)) {
-            String reissuedAccessToken = jwtService.issueAndSetAccessToken(response, userId);
-            jwtService.issueAndSetRefreshToken(response, userId);
-
-            setAuthenticationToContext(reissuedAccessToken);
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        jwtService.logout(userId, response);
     }
 
     private boolean isPermittedURI(String requestURI) {
