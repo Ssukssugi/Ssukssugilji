@@ -24,7 +24,8 @@ public class PlantRepositoryCustomImpl implements PlantRepositoryCustom {
 
     @Override
     public List<UserPlantDto> findPlantWithDiariesByUserId(Long userId) {
-        QDiary subDiary = new QDiary("subDiary");
+        QDiary d1 = new QDiary("d1");
+        QDiary d2 = new QDiary("d2");
 
         List<UserPlantDto> results = queryFactory
             .select(Projections.fields(UserPlantDto.class,
@@ -35,13 +36,29 @@ public class PlantRepositoryCustomImpl implements PlantRepositoryCustom {
                 ExpressionUtils.as(Expressions.constant(0L), "diaryCount")
             ))
             .from(plant)
-            .leftJoin(diary).on(diary.plant.eq(plant)
-                .and(diary.createdAt.eq(
-                    JPAExpressions
-                        .select(subDiary.createdAt.max())
-                        .from(subDiary)
-                        .where(subDiary.plant.eq(plant))
-                )))
+            .leftJoin(diary).on(
+                diary.plant.eq(plant)
+                    .and(diary.date.eq(
+                        JPAExpressions
+                            .select(d1.date.max())
+                            .from(d1)
+                            .where(d1.plant.eq(plant))
+                    ))
+                    .and(diary.createdAt.eq(
+                        JPAExpressions
+                            .select(d2.createdAt.max())
+                            .from(d2)
+                            .where(
+                                d2.plant.eq(plant)
+                                    .and(d2.date.eq(
+                                        JPAExpressions
+                                            .select(d1.date.max())
+                                            .from(d1)
+                                            .where(d1.plant.eq(plant))
+                                    ))
+                            )
+                    ))
+            )
             .where(plant.user.userId.eq(userId))
             .orderBy(plant.createdAt.desc())
             .fetch();
