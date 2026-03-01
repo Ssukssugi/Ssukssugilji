@@ -1,6 +1,5 @@
 package com.ssukssugi.ssukssugilji.plant.service;
 
-import com.ssukssugi.ssukssugilji.plant.controller.dto.GrowthIntroduceRequest;
 import com.ssukssugi.ssukssugilji.plant.dao.GrowthRepository;
 import com.ssukssugi.ssukssugilji.plant.dto.GrowthVo;
 import com.ssukssugi.ssukssugilji.plant.dto.GrowthVoListDto;
@@ -57,13 +56,16 @@ public class GrowthService {
             .build();
     }
 
-    public void createGrowth(User user, GrowthIntroduceRequest request) {
-        Diary before = diaryService.getById(request.beforeDiaryId());
-        Diary after = diaryService.getById(request.afterDiaryId());
-        if (!before.getPlant().equals(after.getPlant())) {
-            throw new IllegalArgumentException("The diaries do not belong to the same plant.");
-        }
+    public void deleteGrowth(Long growthId) {
+        growthRepository.deleteById(growthId);
+    }
 
+    @Transactional(readOnly = true)
+    public Page<Growth> getGrowthListPage(@Nullable Long cursorGrowthId) {
+        return new PageImpl<>(growthRepository.findNextGrowthPage(cursorGrowthId, PAGE_SIZE));
+    }
+
+    public void createEntity(User user, Diary before, Diary after) {
         growthRepository.save(
             Growth.builder()
                 .user(user)
@@ -73,12 +75,7 @@ public class GrowthService {
         );
     }
 
-    public void deleteGrowth(Long growthId) {
-        growthRepository.deleteById(growthId);
-    }
-
-    @Transactional(readOnly = true)
-    public Page<Growth> getGrowthListPage(@Nullable Long cursorGrowthId) {
-        return new PageImpl<>(growthRepository.findNextGrowthPage(cursorGrowthId, PAGE_SIZE));
+    public void cleanGrowthsByDiaryId(Long diaryId) {
+        growthRepository.cleanGrowthsByDiaryId(diaryId);
     }
 }

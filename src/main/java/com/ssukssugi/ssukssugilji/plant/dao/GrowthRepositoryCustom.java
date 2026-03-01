@@ -7,6 +7,4 @@ import java.util.List;
 public interface GrowthRepositoryCustom {
 
     List<Growth> findNextGrowthPage(@Nullable Long cursorGrowthId, Integer pageSize);
-
-    List<Growth> findRelatedGrowthsByDiaryId(Long plantId);
 }

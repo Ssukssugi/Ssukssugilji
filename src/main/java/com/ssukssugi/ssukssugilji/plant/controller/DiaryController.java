@@ -5,7 +5,7 @@ import com.ssukssugi.ssukssugilji.plant.controller.dto.DiaryCreateResponse;
 import com.ssukssugi.ssukssugilji.plant.controller.dto.DiaryUpdateRequest;
 import com.ssukssugi.ssukssugilji.plant.dto.DiaryByMonthListDto;
 import com.ssukssugi.ssukssugilji.plant.entity.Diary;
-import com.ssukssugi.ssukssugilji.plant.service.DiaryService;
+import com.ssukssugi.ssukssugilji.plant.service.DiaryApplication;
 import com.ssukssugi.ssukssugilji.plant.service.PlantService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -25,8 +25,9 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class DiaryController {
 
+    // TODO: refactor injection
     private final PlantService plantService;
-    private final DiaryService diaryService;
+    private final DiaryApplication diaryApplication;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DiaryCreateResponse> createDiary(
@@ -53,7 +54,7 @@ public class DiaryController {
 
     @DeleteMapping
     public ResponseEntity<Boolean> deleteDiary(@RequestParam("diaryId") Long diaryId) {
-        diaryService.deleteDiary(diaryId);
+        diaryApplication.deleteDiary(diaryId);
         return ResponseEntity.ok(true);
     }
 }

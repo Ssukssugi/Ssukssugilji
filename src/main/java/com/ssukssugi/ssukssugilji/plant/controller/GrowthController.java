@@ -3,6 +3,7 @@ package com.ssukssugi.ssukssugilji.plant.controller;
 import com.ssukssugi.ssukssugilji.common.UserContext;
 import com.ssukssugi.ssukssugilji.plant.controller.dto.GrowthIntroduceRequest;
 import com.ssukssugi.ssukssugilji.plant.dto.GrowthVoListDto;
+import com.ssukssugi.ssukssugilji.plant.service.GrowthApplication;
 import com.ssukssugi.ssukssugilji.plant.service.GrowthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class GrowthController {
 
+    private final GrowthApplication growthApplication;
+    // TODO: delete growthService injection here
     private final GrowthService growthService;
 
     @GetMapping
@@ -30,7 +33,7 @@ public class GrowthController {
     @PostMapping
     public ResponseEntity<Boolean> introduceGrowth(
         @RequestBody @Valid GrowthIntroduceRequest request) {
-        growthService.createGrowth(UserContext.getUser(), request);
+        growthApplication.createGrowth(UserContext.getUser(), request);
         return ResponseEntity.ok(true);
     }
 
