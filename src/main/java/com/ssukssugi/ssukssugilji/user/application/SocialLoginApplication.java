@@ -52,6 +52,7 @@ public class SocialLoginApplication {
             .builder()
             .isRegistered(true)
             .existInfo(existInfo)
+            .emailAddress(user.getEmailAddress())
             .build();
     }
 
