@@ -18,7 +18,8 @@ public class SecurityConfig {
 
     public static final String PERMITTED_URI[] = {
         "/api/v1/auth/**",
-        "/hello"
+        "/hello",
+        "/actuator/**",
     };
     private static final String PERMITTED_ROLES[] = {"USER"};
 
